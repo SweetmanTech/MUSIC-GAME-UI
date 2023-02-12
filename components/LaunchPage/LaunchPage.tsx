@@ -10,7 +10,7 @@ const LaunchPage = (props: any) => {
         height="100"
         width="100"
         alt="logo"
-        className="rounded rounded-full p-3"
+        className="rounded-full p-3"
       />
       <div className="text-8xl">MUSIC GAME</div>
       <button

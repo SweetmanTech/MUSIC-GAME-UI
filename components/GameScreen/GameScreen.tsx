@@ -40,7 +40,9 @@ const GameScreen = () => {
       </div>
       {choices.length > 1 && (
         <div>
-          <button type="button">Remix</button>
+          <button type="button" className="p-4 m-2 border-purple-600 border-4 rounded-2xl">
+            Remix
+          </button>
         </div>
       )}
     </div>

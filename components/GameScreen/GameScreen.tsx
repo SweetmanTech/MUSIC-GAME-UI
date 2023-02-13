@@ -1,5 +1,11 @@
 import { useState } from "react"
 
+interface IOption {
+  id: string
+  name: string
+  borderColor: string
+  imgUrl?: string
+}
 const GameScreen = () => {
   const [choices, setChoices] = useState([])
   const [checked, setChecked] = useState({
@@ -8,6 +14,12 @@ const GameScreen = () => {
     bass: false,
     guitar: false,
   })
+  const options: IOption[] = [
+    { id: "drums", name: "Drums", borderColor: "red" },
+    { id: "bass", name: "Bass", borderColor: "green" },
+    { id: "guitar", name: "Guitar", borderColor: "blue" },
+    { id: "vocal", name: "Vocals", borderColor: "orange" },
+  ]
   const onClickHandler = (value: string) => {
     if (choices.includes(value)) {
       setChoices([...choices.filter((e) => e !== value)])
@@ -17,52 +29,25 @@ const GameScreen = () => {
     setChecked({ ...checked, [value]: !checked[value] })
   }
   return (
-    <div className="flex flex-col h-screen align-center items-center justify-center gap-4">
+    <div className="flex flex-col items-center justify-center h-screen gap-4 align-center">
       <div className="flex flex-row ">
-        <button
-          type="button"
-          className={`p-4 m-2 border-red-${checked.drums ? "600" : "500"} border-${
-            checked.drums ? "4" : "2"
-          } rounded-2xl disabled:opacity-25`}
-          onClick={() => onClickHandler("drums")}
-          disabled={choices.length === 2 && !choices.includes("drums")}
-        >
-          Drums
-        </button>
-        <button
-          type="button"
-          className={`p-4 m-2 border-green-${checked.bass ? "600" : "500"} border-${
-            checked.bass ? "4" : "2"
-          } rounded-2xl disabled:opacity-25`}
-          onClick={() => onClickHandler("bass")}
-          disabled={choices.length === 2 && !choices.includes("bass")}
-        >
-          Bass
-        </button>
-        <button
-          type="button"
-          className={`p-4 m-2 border-blue-${checked.guitar ? "600" : "500"} border-${
-            checked.guitar ? "4" : "2"
-          } rounded-2xl disabled:opacity-25`}
-          onClick={() => onClickHandler("guitar")}
-          disabled={choices.length === 2 && !choices.includes("guitar")}
-        >
-          Guitar
-        </button>
-        <button
-          type="button"
-          className={`p-4 m-2 border-orange-${checked.vocal ? "600" : "500"} border-${
-            checked.vocal ? "4" : "2"
-          } rounded-2xl disabled:opacity-25`}
-          onClick={() => onClickHandler("vocal")}
-          disabled={choices.length === 2 && !choices.includes("vocal")}
-        >
-          Vocals
-        </button>
+        {options.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            className={`p-4 m-2 border-${option.borderColor}-${
+              checked[option.id] ? "600" : "500"
+            } border-${checked[option.id] ? "4" : "2"} rounded-2xl disabled:opacity-25`}
+            onClick={() => onClickHandler(option.id)}
+            disabled={choices.length === 2 && !choices.includes(option.id)}
+          >
+            {option.name}
+          </button>
+        ))}
       </div>
       {choices.length > 1 && (
         <div>
-          <button type="button" className="p-4 m-2 border-purple-600 border-4 rounded-2xl">
+          <button type="button" className="p-4 m-2 border-4 border-purple-600 rounded-2xl">
             Remix
           </button>
         </div>

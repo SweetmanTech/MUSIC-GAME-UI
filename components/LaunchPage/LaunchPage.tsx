@@ -4,13 +4,19 @@ const LaunchPage = (props: any) => {
   const { onClick } = props
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center gap-3">
-      <Image src="/logo.png" height="100" width="150" alt="logo" />
-      <div>CRE8ORS x ChillRx</div>
+    <div className="h-screen flex flex-col items-center justify-center gap-10">
+      <Image
+        src="/musicGameLogo.png"
+        height="100"
+        width="100"
+        alt="logo"
+        className="rounded rounded-full p-3"
+      />
+      <div className="text-8xl">MUSIC GAME</div>
       <button
         type="button"
         onClick={onClick}
-        className="bg-[#be0e11] text-white font-bold py-2 px-4 rounded-full hover:bg-white hover:text-[#be0e11]"
+        className="bg-[#be0e11] text-white text-xl font-bold py-4 px-8 rounded-full hover:bg-white hover:text-[#be0e11]"
       >
         enter
       </button>

@@ -1,4 +1,4 @@
-# CRE8ORS UI
+# MUSIC GAME UI
 
 This is a [RainbowKit](https://rainbowkit.com) + [wagmi](https://wagmi.sh) + [Next.js](https://nextjs.org/) project.
 
@@ -28,6 +28,12 @@ Finally, run the development server:
 
 ```bash
 npm run dev
+```
+
+yarn
+
+```bash
+yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

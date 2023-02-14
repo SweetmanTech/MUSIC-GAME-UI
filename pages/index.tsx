@@ -1,9 +1,10 @@
 import type { NextPage } from "next"
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import SeoHead from "../components/SeoHead"
 import LaunchPage from "../components/LaunchPage"
-import GameScreen from "../components/GameScreen"
 
+const GameScreen = dynamic(() => import("../components/GameScreen"), { ssr: false })
 const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)
 

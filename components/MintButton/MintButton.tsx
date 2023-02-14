@@ -4,9 +4,9 @@ import { FC, useState } from "react"
 import { useSigner } from "wagmi"
 import Confetti from "react-confetti"
 import { useRouter } from "next/router"
-import { AbiCoder } from "ethers/lib/utils.js"
 import purchase from "../../lib/purchase"
 import useWindowSize from "../../lib/useWindowSize"
+import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
 
 interface MintButtonProps {
   cid?: string
@@ -17,30 +17,18 @@ const MintButton: FC<MintButtonProps> = ({ cid }) => {
   const [startConfetti, setStartConfetti] = useState(false)
   const { data: signer } = useSigner()
   const { width, height } = useWindowSize()
-  console.log("cid", cid)
   const router = useRouter()
 
   const handleClick = async () => {
     if (!signer) return
     setLoading(true)
-    const abiCoder = new AbiCoder()
-    const initialData = abiCoder.encode(
-      ["string", "string", "string"],
-      [
-        "Music Game by the CRE8ORS",
-        `ipfs://bafkreie7jnfyuomzbuqlaqvmkpu5thmuuuznbuxttlaw6axx3dx54pbtya`,
-        `ipfs://${cid}`,
-      ],
-    )
-    console.log("initialData", initialData)
+    const initialData = getEncodedPurchaseData(cid)
     const receipt = await purchase(signer, initialData)
     if (!receipt.error) {
       setStartConfetti(true)
       setTimeout(() => {
-        console.log("receipt", receipt)
         setStartConfetti(false)
         const tokenId = receipt.events[0].args.tokenId.toString()
-        console.log("receipt has tokenId?", tokenId)
         router.push(
           `https://testnets.opensea.io/assets/goerli/${process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS}/${tokenId}`,
         )

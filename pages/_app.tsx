@@ -6,7 +6,7 @@ import { allChains, configureChains, createClient, WagmiConfig } from "wagmi"
 import { publicProvider } from "wagmi/providers/public"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import { MusicGameProvider as MusicGameProvider } from "../providers/MusicGameProvider"
+import { MusicGameProvider } from "../providers/MusicGameProvider"
 
 const { chains, provider, webSocketProvider } = configureChains(
   allChains.filter(

@@ -7,7 +7,7 @@ const getEncodedPurchaseData = (cid: string) => {
     ["string", "string", "string"],
     [
       "Music Game by the CRE8ORS",
-      `ipfs://bafkreie7jnfyuomzbuqlaqvmkpu5thmuuuznbuxttlaw6axx3dx54pbtya`,
+      `ipfs://bafkreiewdpza2o3tkehctw6xmk3hynktt4tcqeb6fsrqhmqxnnswi5svmm`,
       `ipfs://${cid}`,
     ],
   )

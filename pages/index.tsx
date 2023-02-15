@@ -4,7 +4,8 @@ import dynamic from "next/dynamic"
 import SeoHead from "../components/SeoHead"
 import LaunchPage from "../components/LaunchPage"
 
-const GameScreen = dynamic(() => import("../components/GameScreen"), { ssr: false })
+const GameScreen = dynamic(() => import("../components/GameScreen"))
+
 const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)
 

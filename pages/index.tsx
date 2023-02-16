@@ -19,7 +19,17 @@ const Home: NextPage = () => {
 
       {!entered && <LaunchPage onClick={setEntered} />}
       {entered && !minted && <GameScreen />}
-      {minted && <Results />}
+      {minted && (
+        <Results
+          metadata={{
+            name: "MUSIC GAME 20/100000",
+            description: "Music Game by the CRE8ORS",
+            image: "ipfs://bafkreiewdpza2o3tkehctw6xmk3hynktt4tcqeb6fsrqhmqxnnswi5svmm",
+            animation_url: "ipfs://bafybeib5n2bawajdvm5sh2mh7eoncxm3gpeyeuq6ksgysovd3ttrr3d3bm",
+            properties: { number: 20, name: "MUSIC GAME" },
+          }}
+        />
+      )}
     </div>
   )
 }

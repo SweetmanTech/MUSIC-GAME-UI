@@ -11,17 +11,12 @@ const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)
   const [metadata, setMetadata] = useState()
 
-  const handleMint = (newMetadata) => {
-    console.log("metadata", newMetadata)
-    setMetadata(newMetadata)
-  }
-
   return (
     <div className="bg-[#010e17] text-white">
       <SeoHead title="Music Game" description="Music Game coming soon" image="" />
 
       {!entered && <LaunchPage onClick={setEntered} />}
-      {entered && !metadata && <GameScreen onSuccess={handleMint} />}
+      {entered && !metadata && <GameScreen onSuccess={setMetadata} />}
       {metadata && <Results metadata={metadata} />}
     </div>
   )

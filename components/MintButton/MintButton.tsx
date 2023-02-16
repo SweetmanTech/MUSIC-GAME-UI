@@ -2,14 +2,13 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import { FC, useState } from "react"
 import { useSigner } from "wagmi"
-import Confetti from "react-confetti"
 import { NFTStorage } from "nft.storage"
 import Crunker from "crunker"
 import _ from "lodash"
 import purchase from "../../lib/purchase"
-import useWindowSize from "../../lib/useWindowSize"
 import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
 import PopupModal from "../PopupModal"
+import { MUSIC_URLS } from "../../lib/consts"
 
 interface MintButtonProps {
   choices?: string[]
@@ -19,38 +18,14 @@ interface MintButtonProps {
 const client = new NFTStorage({
   token: `${process?.env?.NEXT_PUBLIC_NFT_STORAGE_TOKEN}`,
 })
-const MUSIC_URLS = {
-  drums: [
-    "https://defient-music.s3.amazonaws.com/90_DRUMS_HIPHOP_001-SWEETS.wav",
-    "https://defient-music.s3.amazonaws.com/120_DRUMS_RNB_001-KATEE.wav",
-    "https://defient-music.s3.amazonaws.com/120_DRUMS_RNB_002-JOE.wav",
-  ],
-  vocal: [
-    "https://defient-music.s3.amazonaws.com/120_MUSIC_Bbmin_RNB_002-MCKENNA.wav",
-    "https://defient-music.s3.amazonaws.com/120_MISC_RNB_001-JEFF.wav",
-    "https://defient-music.s3.amazonaws.com/120_MUSIC_Bbmin_RNB_001-SERENA.wav",
-  ],
-  bass: [
-    "https://defient-music.s3.amazonaws.com/120_MUSIC_Bbmin_RNB_002-MCKENNA.wav",
-    "https://defient-music.s3.amazonaws.com/90_DRUMS_HIPHOP_002-SAMEER.wav",
-    "https://defient-music.s3.amazonaws.com/90_DRUMS_TRAP_001-MARION.wav",
-  ],
-  guitar: [
-    "https://defient-music.s3.amazonaws.com/90_MISC_HIPHOP_001-SHANE.wav",
-    "https://defient-music.s3.amazonaws.com/90_MUSIC_Bbmin_HIPHOP_001-MICHAEL.wav",
-    "https://defient-music.s3.amazonaws.com/90_MUSIC_Bbmin_HIPHOP_002-DOM.wav",
-  ],
-}
 
 const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
-  const [loading, setLoading] = useState(false)
-  const [startConfetti, setStartConfetti] = useState(false)
+  const [loading] = useState(false)
   const [mixing, setMixing] = useState<boolean>(false)
   const { data: signer } = useSigner()
 
   const handleClick = async () => {
     if (!signer) return
-    setLoading(true)
     setMixing(true)
     const crunker = new Crunker()
     const buffers = await crunker.fetchAudio(
@@ -70,17 +45,12 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
         tokenId,
         animationUrl: `ipfs://${CID}`,
       })
-      setStartConfetti(true)
-      setTimeout(() => {
-        setStartConfetti(false)
-      }, 5000)
     }
-    setLoading(false)
     setMixing(false)
   }
 
-  const className = `${loading ? "bg-blue-500/50" : "bg-blue-500"} ${
-    !loading && "hover:bg-blue-700"
+  const className = `${mixing ? "bg-blue-500/50" : "bg-blue-500"} ${
+    !mixing && "hover:bg-blue-700"
   } text-white font-bold py-2 px-4 rounded`
   return (
     <ConnectButton.Custom>
@@ -117,13 +87,8 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
               }
 
               return (
-                <button
-                  type="button"
-                  onClick={handleClick}
-                  disabled={loading}
-                  className={className}
-                >
-                  {loading ? (
+                <button type="button" onClick={handleClick} disabled={mixing} className={className}>
+                  {mixing ? (
                     <Image src="/spinner.gif" alt="spinner" width={50} height={50} />
                   ) : (
                     "Remix"

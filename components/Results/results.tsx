@@ -2,12 +2,17 @@
 import { useEffect, useState } from "react"
 import { LensShareButton } from "@infinity-keys/react-lens-share-button"
 import "@infinity-keys/react-lens-share-button/dist/style.css"
+import Confetti from "react-confetti"
 import SkeletonCard from "../SkeletonCard"
 import getIpfsLink from "../../lib/getIpfsLink"
+import useWindowSize from "../../lib/useWindowSize"
 
 const Results = ({ metadata }: any) => {
   const { image, name, animationUrl, tokenId } = metadata
   const [loading, setLoading] = useState(true)
+  const [startConfetti, setStartConfetti] = useState(true)
+  const { width, height } = useWindowSize()
+
   const isTestnet = process.env.NEXT_PUBLIC_CHAIN_ID === "5"
   const network = isTestnet ? "goerli" : "ethereum"
   const openSeaLink = `https://${isTestnet ? "testnets." : ""}opensea.io/assets/${network}/${
@@ -15,7 +20,12 @@ const Results = ({ metadata }: any) => {
   }/${tokenId}`
 
   useEffect(() => {
-    if (tokenId && metadata) setLoading(false)
+    if (tokenId && metadata) {
+      setLoading(false)
+      setTimeout(() => {
+        setStartConfetti(false)
+      }, 5000)
+    }
   }, [tokenId, metadata])
 
   return (
@@ -138,6 +148,7 @@ const Results = ({ metadata }: any) => {
           </div>
         </div>
       </footer>
+      {startConfetti && <Confetti width={width} height={height} />}
     </div>
   )
 }

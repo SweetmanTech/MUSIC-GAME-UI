@@ -127,7 +127,7 @@ const Results = ({ metadata }: any) => {
         </div>
       </div>
 
-      <footer className="items-center w-full m-auto bg-white text-black rounded-lg px-4justify-center ">
+      <footer className="items-center w-full m-auto text-white rounded-lg px-4justify-center ">
         <div className="flex-col sm:flex sm:items-center sm:justify-between">
           <div className="text-md">
             A Social Experiment made with &#10084;&#65039; by @defient.co

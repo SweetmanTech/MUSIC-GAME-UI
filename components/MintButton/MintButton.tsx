@@ -3,30 +3,35 @@ import Image from "next/image"
 import { FC, useState } from "react"
 import { useSigner } from "wagmi"
 import Confetti from "react-confetti"
-import { ContractInterface } from "ethers/lib/ethers"
+import { useRouter } from "next/router"
 import purchase from "../../lib/purchase"
 import useWindowSize from "../../lib/useWindowSize"
+import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
 
 interface MintButtonProps {
-  contractAddress: string
-  abi: ContractInterface
-  formResponse?: string
+  cid?: string
   resetFormResponse?: (value: string) => void
 }
-const MintButton: FC<MintButtonProps> = ({ contractAddress, abi }) => {
+const MintButton: FC<MintButtonProps> = ({ cid }) => {
   const [loading, setLoading] = useState(false)
   const [startConfetti, setStartConfetti] = useState(false)
   const { data: signer } = useSigner()
   const { width, height } = useWindowSize()
+  const router = useRouter()
 
   const handleClick = async () => {
     if (!signer) return
     setLoading(true)
-    const receipt = await purchase(contractAddress, signer, abi)
+    const initialData = getEncodedPurchaseData(cid)
+    const receipt = await purchase(signer, initialData)
     if (!receipt.error) {
       setStartConfetti(true)
       setTimeout(() => {
         setStartConfetti(false)
+        const tokenId = receipt.events[0].args.tokenId.toString()
+        router.push(
+          `https://testnets.opensea.io/assets/goerli/${process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS}/${tokenId}`,
+        )
       }, 5000)
     }
     setLoading(false)

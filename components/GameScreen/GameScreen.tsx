@@ -5,6 +5,7 @@ import _ from "lodash"
 import { toast } from "react-toastify"
 import Image from "next/image"
 import PopupModal from "../PopupModal"
+import MintButton from "../MintButton"
 
 const client = new NFTStorage({
   token: `${process?.env?.NEXT_PUBLIC_NFT_STORAGE_TOKEN}`,
@@ -86,6 +87,7 @@ const GameScreen = () => {
       toast.success(`🎉 Remix created!, check it out at ipfs://${cid}`)
     }
   }, [cid])
+
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4 align-center">
       <div className="flex flex-row ">
@@ -114,6 +116,7 @@ const GameScreen = () => {
           </button>
         </div>
       )}
+      {cid && <MintButton cid={cid} />}
       {mixing && <PopupModal open={mixing} />}
     </div>
   )

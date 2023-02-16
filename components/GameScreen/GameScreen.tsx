@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react"
-import Crunker from "crunker"
-import { NFTStorage } from "nft.storage"
-import _ from "lodash"
-import { toast } from "react-toastify"
+import { useState } from "react"
 import Image from "next/image"
-import PopupModal from "../PopupModal"
 import MintButton from "../MintButton"
 
 interface IOption {

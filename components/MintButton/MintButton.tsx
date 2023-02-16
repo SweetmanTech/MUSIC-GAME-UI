@@ -20,7 +20,6 @@ const client = new NFTStorage({
 })
 
 const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
-  const [loading] = useState(false)
   const [mixing, setMixing] = useState<boolean>(false)
   const { data: signer } = useSigner()
 

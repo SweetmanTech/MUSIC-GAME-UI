@@ -11,6 +11,8 @@ const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)
   const [minted, setMinted] = useState(true)
 
+  if (false) console.log(setMinted)
+
   return (
     <div className="bg-[#010e17] text-white">
       <SeoHead title="Music Game" description="Music Game coming soon" image="" />

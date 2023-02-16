@@ -3,21 +3,20 @@ import Image from "next/image"
 import { FC, useState } from "react"
 import { useSigner } from "wagmi"
 import Confetti from "react-confetti"
-import { useRouter } from "next/router"
 import purchase from "../../lib/purchase"
 import useWindowSize from "../../lib/useWindowSize"
 import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
 
 interface MintButtonProps {
   cid?: string
-  resetFormResponse?: (value: string) => void
+  onSuccess: Function
 }
-const MintButton: FC<MintButtonProps> = ({ cid }) => {
+
+const MintButton: FC<MintButtonProps> = ({ cid, onSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [startConfetti, setStartConfetti] = useState(false)
   const { data: signer } = useSigner()
   const { width, height } = useWindowSize()
-  const router = useRouter()
 
   const handleClick = async () => {
     if (!signer) return
@@ -25,13 +24,16 @@ const MintButton: FC<MintButtonProps> = ({ cid }) => {
     const initialData = getEncodedPurchaseData(cid)
     const receipt = await purchase(signer, initialData)
     if (!receipt.error) {
+      const tokenId = receipt.events[0].args.tokenId.toString()
+      onSuccess({
+        image: "ipfs://bafkreiewdpza2o3tkehctw6xmk3hynktt4tcqeb6fsrqhmqxnnswi5svmm",
+        name: `MUSIC GAME ${tokenId}`,
+        tokenId,
+        animationUrl: `ipfs://${cid}`,
+      })
       setStartConfetti(true)
       setTimeout(() => {
         setStartConfetti(false)
-        const tokenId = receipt.events[0].args.tokenId.toString()
-        router.push(
-          `https://testnets.opensea.io/assets/goerli/${process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS}/${tokenId}`,
-        )
       }, 5000)
     }
     setLoading(false)

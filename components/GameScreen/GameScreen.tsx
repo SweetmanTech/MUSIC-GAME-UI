@@ -43,7 +43,7 @@ interface IChecked {
   bass: boolean
   guitar: boolean
 }
-const GameScreen = () => {
+const GameScreen = ({ onSuccess }: any) => {
   const [choices, setChoices] = useState<Array<string>>([])
   const [checked, setChecked] = useState<IChecked>({
     drums: false,
@@ -116,7 +116,7 @@ const GameScreen = () => {
           </button>
         </div>
       )}
-      {cid && <MintButton cid={cid} />}
+      {cid && <MintButton cid={cid} onSuccess={onSuccess} />}
       {mixing && <PopupModal open={mixing} />}
     </div>
   )

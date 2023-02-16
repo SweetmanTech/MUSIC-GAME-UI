@@ -5,9 +5,8 @@ import "@infinity-keys/react-lens-share-button/dist/style.css"
 import SkeletonCard from "../SkeletonCard"
 import getIpfsLink from "../../lib/getIpfsLink"
 
-const Results = ({ metadata, tokenId }: any) => {
-  const { image, name } = metadata
-  const haveTokenId = true
+const Results = ({ metadata }: any) => {
+  const { image, name, animationUrl, tokenId } = metadata
   const [loading, setLoading] = useState(true)
   const isTestnet = process.env.NEXT_PUBLIC_CHAIN_ID === "5"
   const network = isTestnet ? "goerli" : "ethereum"
@@ -37,7 +36,7 @@ const Results = ({ metadata, tokenId }: any) => {
             </div> */}
             <div className="max-w-sm bg-black lg:scale-y-90 max-h-fit rounded-xl flex flex-col border border-500-white justify-around align-center items-center">
               <audio controls>
-                <source src={getIpfsLink(metadata.animation_url)} type="audio/mpeg" />
+                <source src={getIpfsLink(animationUrl)} type="audio/mpeg" />
                 <track kind="captions" />
                 Your browser does not support the audio element.
               </audio>
@@ -50,7 +49,7 @@ const Results = ({ metadata, tokenId }: any) => {
               </div>
             </div>
             {/* <!--Card 2--> */}
-            {loading && haveTokenId && <SkeletonCard />}
+            {loading && <SkeletonCard />}
             {!loading && (
               <div className="max-w-sm bg-black lg:scale-y-90 max-h-fit rounded-xl ">
                 <a href={openSeaLink} target="_blank" rel="noreferrer">
@@ -61,9 +60,7 @@ const Results = ({ metadata, tokenId }: any) => {
                   />
 
                   <div className="px-6">
-                    <h4 className="px-2 pb-3 mb-2 text-xl font-medium text-white">
-                      {name} {tokenId && `${tokenId}`}
-                    </h4>
+                    <h4 className="px-2 pb-3 mb-2 text-xl font-medium text-white">{name}</h4>
                     <svg
                       width="100"
                       height="24"

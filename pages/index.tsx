@@ -28,6 +28,7 @@ const Home: NextPage = () => {
             animation_url: "ipfs://bafybeib5n2bawajdvm5sh2mh7eoncxm3gpeyeuq6ksgysovd3ttrr3d3bm",
             properties: { number: 20, name: "MUSIC GAME" },
           }}
+          tokenId={20}
         />
       )}
     </div>

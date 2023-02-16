@@ -1,14 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react"
-import { Share, Tweet } from "react-twitter-widgets"
 import { LensShareButton } from "@infinity-keys/react-lens-share-button"
 import "@infinity-keys/react-lens-share-button/dist/style.css"
 import SkeletonCard from "../SkeletonCard"
 import getIpfsLink from "../../lib/getIpfsLink"
 
 const Results = ({ metadata, tokenId }: any) => {
-  console.log("metadata", metadata)
-  const twitterId = ""
   const { image, name } = metadata
   const haveTokenId = true
   const [loading, setLoading] = useState(true)

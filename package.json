@@ -12,6 +12,7 @@
     "format": "yarn run prettier:fix && yarn run lint:fix"
   },
   "dependencies": {
+    "@infinity-keys/react-lens-share-button": "^0.0.5",
     "@rainbow-me/rainbowkit": "^0.7.4",
     "@thirdweb-dev/react": "^3.6.7",
     "@thirdweb-dev/sdk": "^3.6.7",

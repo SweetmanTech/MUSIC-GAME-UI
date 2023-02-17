@@ -2,38 +2,54 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import { FC, useState } from "react"
 import { useSigner } from "wagmi"
-import Confetti from "react-confetti"
-import { ContractInterface } from "ethers/lib/ethers"
+import { NFTStorage } from "nft.storage"
+import Crunker from "crunker"
+import _ from "lodash"
 import purchase from "../../lib/purchase"
-import useWindowSize from "../../lib/useWindowSize"
+import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
+import PopupModal from "../PopupModal"
+import { MUSIC_URLS } from "../../lib/consts"
 
 interface MintButtonProps {
-  contractAddress: string
-  abi: ContractInterface
-  formResponse?: string
-  resetFormResponse?: (value: string) => void
+  choices?: string[]
+  onSuccess: Function
 }
-const MintButton: FC<MintButtonProps> = ({ contractAddress, abi }) => {
-  const [loading, setLoading] = useState(false)
-  const [startConfetti, setStartConfetti] = useState(false)
+
+const client = new NFTStorage({
+  token: `${process?.env?.NEXT_PUBLIC_NFT_STORAGE_TOKEN}`,
+})
+
+const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
+  const [mixing, setMixing] = useState<boolean>(false)
   const { data: signer } = useSigner()
-  const { width, height } = useWindowSize()
 
   const handleClick = async () => {
     if (!signer) return
-    setLoading(true)
-    const receipt = await purchase(contractAddress, signer, abi)
+    setMixing(true)
+    const crunker = new Crunker()
+    const buffers = await crunker.fetchAudio(
+      _.sample(MUSIC_URLS[choices[0]]),
+      _.sample(MUSIC_URLS[choices[1]]),
+    )
+    const merged = await crunker.mergeAudio(buffers)
+    const output = await crunker.export(merged, "audio/wav")
+    const CID = await client.storeBlob(output.blob)
+    const initialData = getEncodedPurchaseData(CID)
+    const receipt = await purchase(signer, initialData)
     if (!receipt.error) {
-      setStartConfetti(true)
-      setTimeout(() => {
-        setStartConfetti(false)
-      }, 5000)
+      const tokenId = receipt.events[0].args.tokenId.toString()
+      onSuccess({
+        image: "ipfs://bafkreiewdpza2o3tkehctw6xmk3hynktt4tcqeb6fsrqhmqxnnswi5svmm",
+        name: `MUSIC GAME ${tokenId}`,
+        tokenId,
+        animationUrl: `ipfs://${CID}`,
+      })
     }
-    setLoading(false)
+    setMixing(false)
   }
 
-  const className = `${loading ? "bg-blue-500/50" : "bg-blue-500"} ${
-    !loading && "hover:bg-blue-700"
+  const className = `${mixing ? "bg-blue-500/50" : "bg-blue-500"} ${
+    !mixing && "hover:bg-blue-700"
   } text-white font-bold py-2 px-4 rounded`
   return (
     <ConnectButton.Custom>
@@ -70,21 +86,16 @@ const MintButton: FC<MintButtonProps> = ({ contractAddress, abi }) => {
               }
 
               return (
-                <button
-                  type="button"
-                  onClick={handleClick}
-                  disabled={loading}
-                  className={className}
-                >
-                  {loading ? (
+                <button type="button" onClick={handleClick} disabled={mixing} className={className}>
+                  {mixing ? (
                     <Image src="/spinner.gif" alt="spinner" width={50} height={50} />
                   ) : (
-                    "Mint"
+                    "Remix"
                   )}
                 </button>
               )
             })()}
-            {startConfetti && <Confetti width={width} height={height} />}
+            {mixing && <PopupModal open={mixing} />}
           </div>
         )
       }}

@@ -32,10 +32,15 @@ const mixAudio = (track1: string, track2: string, output: string) =>
 class Remix {
   @Post()
   async remix(@Body() body: { track1: string; track2: string }) {
+    console.log("hitting api")
     const { track1, track2 } = body
+    console.log("track1", track1)
+    console.log("track2", track2)
     const currentPath = path.resolve(process.cwd())
+    console.log("currentPath", currentPath)
     const outputFile = path.join(currentPath, "output.wav")
     await mixAudio(track1, track2, outputFile)
+    console.log("mixed audio")
     const audioFile = readFileSync(outputFile)
     const fileToBlob = new Blob([audioFile], { type: "audio/wav" })
     const CID = await client.storeBlob(fileToBlob as any)

@@ -35,13 +35,11 @@ class Remix {
     const outputFile = "/tmp/output.wav"
     try {
       await mixAudio(track1, track2, outputFile)
-      console.log("mixed audio")
       const audioFile = readFileSync(outputFile)
       const fileToBlob = new Blob([audioFile], { type: "audio/wav" })
       const CID = await client.storeBlob(fileToBlob as any)
       return { CID }
     } catch (e) {
-      console.log("error", e)
       throw new Error(e)
     }
   }

@@ -34,7 +34,7 @@ class Remix {
   async remix(@Body() body: { track1: string; track2: string }) {
     const { track1, track2 } = body
     const currentPath = path.resolve(process.cwd())
-    const outputFile = path.join(currentPath, "output.wav")
+    const outputFile = path.join(currentPath, "/tmp/output.wav")
     try {
       await mixAudio(track1, track2, outputFile)
       console.log("mixed audio")

@@ -2,9 +2,8 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import { FC, useState } from "react"
 import { useSigner } from "wagmi"
-import { NFTStorage } from "nft.storage"
-import Crunker from "crunker"
 import _ from "lodash"
+import axios from "axios"
 import purchase from "../../lib/purchase"
 import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
 import PopupModal from "../PopupModal"
@@ -15,25 +14,21 @@ interface MintButtonProps {
   onSuccess: Function
 }
 
-const client = new NFTStorage({
-  token: `${process?.env?.NEXT_PUBLIC_NFT_STORAGE_TOKEN}`,
-})
-
 const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
   const [mixing, setMixing] = useState<boolean>(false)
+  const [isMinting, setIsMinting] = useState<boolean>(false)
   const { data: signer } = useSigner()
 
   const handleClick = async () => {
     if (!signer) return
     setMixing(true)
-    const crunker = new Crunker()
-    const buffers = await crunker.fetchAudio(
-      _.sample(MUSIC_URLS[choices[0]]),
-      _.sample(MUSIC_URLS[choices[1]]),
-    )
-    const merged = await crunker.mergeAudio(buffers)
-    const output = await crunker.export(merged, "audio/wav")
-    const CID = await client.storeBlob(output.blob)
+    const remixAndUploadResponse = await axios.post("/api/remix", {
+      track1: _.sample(MUSIC_URLS[choices[0]]),
+      track2: _.sample(MUSIC_URLS[choices[1]]),
+    })
+    const { CID } = remixAndUploadResponse.data
+    setMixing(false)
+    setIsMinting(true)
     const initialData = getEncodedPurchaseData(CID)
     const receipt = await purchase(signer, initialData)
     if (!receipt.error) {
@@ -45,7 +40,7 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
         animationUrl: `ipfs://${CID}`,
       })
     }
-    setMixing(false)
+    setIsMinting(false)
   }
 
   const className = `${mixing ? "bg-blue-500/50" : "bg-blue-500"} ${
@@ -87,7 +82,7 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
 
               return (
                 <button type="button" onClick={handleClick} disabled={mixing} className={className}>
-                  {mixing ? (
+                  {mixing || isMinting ? (
                     <Image src="/spinner.gif" alt="spinner" width={50} height={50} />
                   ) : (
                     "Remix"
@@ -95,7 +90,7 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
                 </button>
               )
             })()}
-            {mixing && <PopupModal open={mixing} />}
+            {(mixing || isMinting) && <PopupModal open={mixing || isMinting} mixing={mixing} />}
           </div>
         )
       }}

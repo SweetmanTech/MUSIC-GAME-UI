@@ -1,7 +1,6 @@
 import { NFTStorage } from "nft.storage"
 /* eslint-disable class-methods-use-this */
 import { createHandler, Post, Body } from "next-api-decorators"
-import path from "path"
 import { readFileSync } from "fs"
 import { Blob } from "buffer"
 
@@ -33,8 +32,7 @@ class Remix {
   @Post()
   async remix(@Body() body: { track1: string; track2: string }) {
     const { track1, track2 } = body
-    const currentPath = path.resolve(process.cwd())
-    const outputFile = path.join(currentPath, "/tmp/output.wav")
+    const outputFile = "/tmp/output.wav"
     try {
       await mixAudio(track1, track2, outputFile)
       console.log("mixed audio")

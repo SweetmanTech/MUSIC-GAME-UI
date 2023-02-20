@@ -12,7 +12,7 @@ const PopupModal = ({ open, mixing }: { open: boolean; mixing: boolean }) =>
             alt="potion"
             width={800}
             height={800}
-            className="rounded-full"
+            className="rounded-2xl"
           />
         </div>
       </div>

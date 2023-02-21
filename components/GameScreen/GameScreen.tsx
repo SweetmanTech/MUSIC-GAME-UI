@@ -50,7 +50,7 @@ const GameScreen = ({ onSuccess }: any) => {
     const musicChoice = _.sample(MUSIC_URLS[value])
     setInstrumentChoice({
       ...instrumentChoice,
-      [value]: instrumentChoice[musicChoice],
+      [value]: musicChoice,
     })
     setMusicUrl(musicChoice)
     setPlayAudio(true)

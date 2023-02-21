@@ -2,7 +2,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import { FC, useState } from "react"
 import { useSigner } from "wagmi"
-import _ from "lodash"
 import axios from "axios"
 import purchase from "../../lib/purchase"
 import getEncodedPurchaseData from "../../lib/getEncodedPurchaseData"
@@ -11,7 +10,12 @@ import PopupModal from "../PopupModal"
 interface MintButtonProps {
   choices?: string[]
   onSuccess: (metadata: any) => void
-  instrumentUrl: { drums: string; vocal: string; bass: string; guitar: string }
+  instrumentUrl: {
+    drums: string | null
+    vocal: string | null
+    bass: string | null
+    guitar: string | null
+  }
 }
 
 const MintButton: FC<MintButtonProps> = ({ onSuccess, choices, instrumentUrl }) => {
@@ -23,8 +27,8 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices, instrumentUrl }) 
     if (!signer) return
     setMixing(true)
     const remixAndUploadResponse = await axios.post("/api/remix", {
-      track1: _.sample(instrumentUrl[choices[0]]),
-      track2: _.sample(instrumentUrl[choices[1]]),
+      track1: instrumentUrl[choices[0]],
+      track2: instrumentUrl[choices[1]],
     })
     const { CID } = remixAndUploadResponse.data
     setMixing(false)

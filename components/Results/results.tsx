@@ -61,8 +61,7 @@ const Results = ({ metadata }: any) => {
                 <div>
                   <TwitterShareButton
                     url={openSeaLink}
-                    title="Wow! I just remixed a song with ChillPill's music game. Check it out here:\n"
-                    via="defientCo"
+                    title="Wow! I just remixed a song with ChillPill's music game. Check it out here:"
                     hashtags={["ChillPill", "NFT", "MusicGame", "DefientCo"]}
                     blankTarget
                   >

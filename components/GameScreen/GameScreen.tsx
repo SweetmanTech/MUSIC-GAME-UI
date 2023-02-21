@@ -57,7 +57,10 @@ const GameScreen = ({ onSuccess }: any) => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4 align-center">
+    <div className="flex flex-col items-center justify-center h-screen gap-4 p-4 align-center">
+      <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">
+        Pick any 2 instrutments, you can hover to hear possible choice.
+      </div>
       <div className="flex flex-row ">
         {options.map((option) => (
           <div key={option.id}>

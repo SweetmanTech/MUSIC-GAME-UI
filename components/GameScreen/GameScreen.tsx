@@ -60,7 +60,7 @@ const GameScreen = ({ onSuccess }: any) => {
     <div className="flex flex-col items-center justify-center h-screen gap-4 align-center">
       <div className="flex flex-row ">
         {options.map((option) => (
-          <>
+          <div key={option.id}>
             <button
               key={option.id}
               type="button"
@@ -84,7 +84,7 @@ const GameScreen = ({ onSuccess }: any) => {
                 <track kind="captions" />
               </audio>
             )}
-          </>
+          </div>
         ))}
       </div>
 

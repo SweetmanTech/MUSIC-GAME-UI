@@ -20,5 +20,9 @@ const SocketHandler = (req, res) => {
   console.log("Setting up socket")
   res.end()
 }
-
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
 export default SocketHandler

@@ -8,14 +8,15 @@ const useChat = () => {
   const [messages, setMessages] = useState([])
   const socketRef = useRef(null) // Sent and received messages
   const socketInitializer = useCallback(async (): Promise<void> => {
-    await fetch("/api/socket")
-    socketRef.current = io()
-    socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, (message) => {
-      const incomingMessage = {
-        ...message,
-        ownedByCurrentUser: message.senderId === socketRef.current.id,
-      }
-      setMessages([...messages, incomingMessage])
+    fetch("/api/socket").finally(() => {
+      socketRef.current = io()
+      socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, (message) => {
+        const incomingMessage = {
+          ...message,
+          ownedByCurrentUser: message.senderId === socketRef.current.id,
+        }
+        setMessages([...messages, incomingMessage])
+      })
     })
   }, [messages])
 

@@ -1,45 +1,39 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import * as Ably from "ably/promises"
+import { configureAbly } from "@ably-labs/react-hooks"
 
-import { io } from "socket.io-client"
-
-const NEW_CHAT_MESSAGE_EVENT = "newChatMessage" // Name of the event
-
-const useChat = () => {
+const useChat = (channelRoom: string) => {
   const [messages, setMessages] = useState([])
-  const socketRef = useRef(null) // Sent and received messages
-  const socketInitializer = useCallback(async (): Promise<void> => {
-    fetch("/api/socket").finally(() => {
-      socketRef.current = io()
-      socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, (message) => {
-        const incomingMessage = {
-          ...message,
-          ownedByCurrentUser: message.senderId === socketRef.current.id,
-        }
-        setMessages([...messages, incomingMessage])
-      })
-    })
-  }, [messages])
+  const [channel, setChannel] = useState<Ably.Types.RealtimeChannelPromise | null>(null)
+  const [ably, setAbly] = useState<Ably.Types.RealtimePromise | null>(null)
+  const messageEnd = useRef(null)
 
-  const disconnectSocket = useCallback(() => {
-    if (socketRef.current) {
-      socketRef.current.disconnect()
-    }
-  }, [])
   useEffect(() => {
-    socketInitializer()
-    return () => {
-      disconnectSocket()
-    }
-  }, [socketInitializer, disconnectSocket])
-  // Sends a message to the server that
-  // forwards it to all users in the same room
-  const sendMessage = (messageBody) => {
-    socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {
-      body: messageBody,
-      senderId: socketRef.current.id,
+    messageEnd.current.scrollIntoView({ behaviour: "smooth" })
+  })
+
+  useEffect(() => {
+    const tempAbly: Ably.Types.RealtimePromise = configureAbly({
+      authUrl: "/api/createTokenRequest",
     })
+
+    const tempChannel = tempAbly.channels.get(channelRoom)
+
+    tempChannel.subscribe((message: Ably.Types.Message) => {
+      const history = messages.slice(-199)
+      setMessages([...history, message])
+    })
+    setChannel(tempChannel)
+    setAbly(tempAbly)
+
+    return () => {
+      tempChannel.unsubscribe()
+    }
+  }, [setChannel, setMessages, messages, channelRoom])
+  const sendChatMessage = (message) => {
+    channel.publish({ name: channelRoom, data: message })
   }
-  return { messages, sendMessage }
+  return { messages, channel, ably, messageEnd, sendChatMessage }
 }
 
 export default useChat

@@ -1,16 +1,17 @@
 import { useState } from "react"
 import useChat from "../../hooks/useChat"
-
 /* eslint-disable @next/next/no-img-element */
-const ChatBox = ({ setOpenChat }) => {
-  const { messages, sendMessage } = useChat()
+const ChatBox = ({ setOpenChat, roomName }) => {
   const [newMessage, setNewMessage] = useState("")
+  const { messages, ably, messageEnd, sendChatMessage } = useChat(
+    roomName.toLowerCase().replace(" ", "-"),
+  )
 
   const handleNewMessageChange = (event) => {
     setNewMessage(event.target.value)
   }
   const handleSendMessage = () => {
-    sendMessage(newMessage)
+    sendChatMessage(newMessage)
     setNewMessage("")
   }
 
@@ -22,9 +23,10 @@ const ChatBox = ({ setOpenChat }) => {
           className="w-10 h-10 rounded-full"
           src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
         />
+        <div className="text-sm text-black">Me</div>
       </div>
       <div className="relative flex-1 p-2 mb-2 text-gray-800 bg-indigo-100 rounded-lg">
-        <div>{message.body}</div>
+        <div>{message.data}</div>
 
         {/* <!-- arrow --> */}
         <div className="absolute right-0 w-2 h-2 transform rotate-45 translate-x-1/2 bg-indigo-100 top-1/2" />
@@ -41,9 +43,10 @@ const ChatBox = ({ setOpenChat }) => {
           className="w-10 h-10 rounded-full"
           src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
         />
+        <div className="text-sm text-black">{message.connectionId}</div>
       </div>
       <div className="relative flex-1 p-2 mb-2 text-white bg-indigo-400 rounded-lg">
-        <div>{message.body}</div>
+        <div>{message.data}</div>
 
         {/* <!-- arrow --> */}
         <div className="absolute left-0 w-2 h-2 transform rotate-45 -translate-x-1/2 bg-indigo-400 top-1/2" />
@@ -60,7 +63,7 @@ const ChatBox = ({ setOpenChat }) => {
         <div className="flex items-center">
           <div className="pl-2">
             <div className="font-semibold">
-              <div className="text-black hover:underline">Music Game Chat Room</div>
+              <div className="text-black hover:underline">{roomName}</div>
             </div>
           </div>
         </div>
@@ -93,11 +96,16 @@ const ChatBox = ({ setOpenChat }) => {
 
       <div className="flex-1 h-full px-4 py-4 overflow-y-auto">
         {messages.map((message) => {
-          if (message.ownedByCurrentUser) {
+          if (message.connectionId === ably.connection.id) {
             return myMessage(message)
           }
           return otherMessage(message)
         })}
+        <div
+          ref={(element) => {
+            messageEnd.current = element
+          }}
+        />
       </div>
 
       <div className="flex items-center p-2 border-t">

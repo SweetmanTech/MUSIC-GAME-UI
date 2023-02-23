@@ -5,7 +5,9 @@ import dynamic from "next/dynamic"
 import SeoHead from "../components/SeoHead"
 import LaunchPage from "../components/LaunchPage"
 import Results from "../components/Results"
-import ChatBox from "../components/ChatBox"
+import RoomName from "../components/RoomName"
+
+const ChatBox = dynamic(() => import("../components/ChatBox"), { ssr: false })
 
 const GameScreen = dynamic(() => import("../components/GameScreen"), { ssr: false })
 
@@ -13,6 +15,8 @@ const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)
   const [metadata, setMetadata] = useState()
   const [openChat, setOpenChat] = useState(false)
+  const [roomName, setRoomName] = useState("")
+  const [hasRoomName, setHasRoomName] = useState(false)
 
   return (
     <div className="bg-[#010e17] text-white">
@@ -42,7 +46,10 @@ const Home: NextPage = () => {
                 </svg>
               </button>
             )}
-            {openChat && <ChatBox setOpenChat={setOpenChat} />}
+            {openChat && !hasRoomName && (
+              <RoomName setRoomName={setRoomName} setHasRoomName={setHasRoomName} />
+            )}
+            {openChat && hasRoomName && <ChatBox setOpenChat={setOpenChat} roomName={roomName} />}
           </div>
         </div>
       )}

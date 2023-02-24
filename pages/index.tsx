@@ -9,7 +9,7 @@ import RoomName from "../components/RoomName"
 
 const ChatBox = dynamic(() => import("../components/ChatBox"), { ssr: false })
 
-const GameScreen = dynamic(() => import("../components/GameScreen"), { ssr: false })
+const GameScreen = dynamic(() => import("../components/GameScreen"))
 
 const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)

@@ -14,7 +14,7 @@ const Chat = () => {
       <div className="flex space-x-4">
         <ChatButton setOpenChat={setOpenChat} openChat={openChat} />
         {openChat && !hasRoomName && (
-          <RoomName setRoomName={setRoomName} setHasRoomName={setHasRoomName} />
+          <RoomName setRoomName={setRoomName} setHasRoomName={setHasRoomName} roomName={roomName} />
         )}
         {openChat && hasRoomName && <ChatBox setOpenChat={setOpenChat} roomName={roomName} />}
       </div>

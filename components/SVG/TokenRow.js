@@ -6,7 +6,6 @@ import { stake, unstake } from "../../lib/stake"
 
 const TokenRow = ({
   tokenId,
-  stakingContract,
   nftContract,
   staked,
   image,

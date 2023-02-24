@@ -21,14 +21,13 @@ const Results = ({ metadata }: any) => {
 
   useEffect(() => {
     if (tokenId && metadata) {
-      console.log("audio url", getIpfsLink(image))
-      console.log(metadata)
+      console.log("audio url", getIpfsLink(animationUrl))
       setLoading(false)
       setTimeout(() => {
         setStartConfetti(false)
       }, 5000)
     }
-  }, [tokenId, metadata, image])
+  }, [tokenId, metadata, animationUrl])
 
   return (
     <div className="flex flex-col items-center justify-around w-full h-screen pt-5 overflow-hidden max-w-screen align-center">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { allChains, useAccount, useNetwork, useSigner } from "wagmi"
 import { Contract, ethers } from "ethers"
+import { useRouter } from "next/router"
 import SteakChatSvg from "../SVG/SteakChat"
 import TokenRow from "../SVG/TokenRow"
 import { getStakedZdkTokens, getZdkTokens } from "../../lib/zdk"
@@ -12,6 +13,8 @@ const MainPage = ({ setPendingTxStep }) => {
   const { data: signer } = useSigner()
   const { address: account } = useAccount()
   const { chain: activeChain } = useNetwork()
+  const router = useRouter()
+  const { address: owner } = router.query
   const chainId = process.env.NEXT_PUBLIC_CHAIN_ID
   const address = process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS
   const chain = allChains.find((c) => c.id === Number(chainId))
@@ -21,28 +24,28 @@ const MainPage = ({ setPendingTxStep }) => {
   const [stakedTokens, setStakedTokens] = useState([])
   const [unstakedTokens, setUnstakedTokens] = useState([])
 
-  const getStakingContract = async (signerOrProvider) => {
-    // TODO: get staking contract AKA music game contract
-    const staking = new Contract(address, abi, signerOrProvider) // await getDCNTStaking(sdk, address)
-    setStakingContract(staking)
-    console.log("staking", staking)
-
-    // TODO: merge concept of 721 + Staking because both exist on same contract.
-    const stakingNftContract = staking // await getDCNT721A(sdk, nftAddress)
-    setNftContract(stakingNftContract)
-    return { staking, nft: stakingNftContract }
-  }
-
   const load = async (signerOrProvider) => {
-    const contracts = await getStakingContract(signerOrProvider)
     if (account) {
       const zdkTokens = await getZdkTokens(account)
       console.log("ZDK TOKENS", zdkTokens)
-      const alchemyTokens = await getNfts()
+      const alchemyTokens = await getNfts(owner as string, address)
       console.log("alchemyTokens", alchemyTokens.ownedNfts)
       setUnstakedTokens(alchemyTokens.ownedNfts)
+      const contract = new Contract(
+        process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS,
+        abi,
+        signerOrProvider,
+      )
+      setNftContract(contract)
       // const stakedPills = await getStakedPills(contracts.staking)
       let stakedZdkTokens = []
+      const stakedRaw = await contract.cre8ingTokens()
+      const stakedStrings = stakedRaw.map((token) => token.toString())
+      const stakedFinal = stakedStrings.filter((token) => token !== "0")
+      console.log("stakedRaw", stakedRaw)
+      console.log("stakedStrings", stakedStrings)
+      console.log("stakedFinal", stakedFinal)
+      setStakedTokens(stakedFinal)
       // if (stakedPills.length > 0) {
       //   stakedZdkTokens = await getStakedZdkTokens(stakedPills)
       // }
@@ -87,15 +90,13 @@ const MainPage = ({ setPendingTxStep }) => {
         {tokens.length > 0 &&
           tokens.map((token) => {
             const myTokenId = parseInt(token.id.tokenId, 16)
-
-            console.log("raw imageUrl", token.metadata.image)
-
             const imgHash = token.metadata.image
             const isInvalid = imgHash.includes("imgUri") || imgHash.includes("Hello World")
             const imageUrl = isInvalid ? "" : getIpfsLink(imgHash)
-            console.log("parsed imageUrl", imageUrl)
-
-            const isStaked = stakedTokens.includes(parseInt(myTokenId, 10))
+            const isStaked = stakedTokens.includes(myTokenId.toString())
+            console.log("isStaked", isStaked)
+            console.log("stakedTokens", stakedTokens)
+            console.log("myTokenId", myTokenId)
             return (
               <TokenRow
                 stakingContract={stakingContract}

@@ -1,7 +1,7 @@
 import { NFTStorage } from "nft.storage"
 /* eslint-disable class-methods-use-this */
 import { createHandler, Post, Body } from "next-api-decorators"
-import { readFileSync, unlinkSync } from "fs"
+import { readFileSync } from "fs"
 import { Blob } from "buffer"
 import { randomUUID } from "crypto"
 
@@ -40,7 +40,6 @@ class Remix {
       const audioFile = readFileSync(outputFile)
       const fileToBlob = new Blob([audioFile], { type: "audio/wav" })
       const CID = await client.storeBlob(fileToBlob as any)
-      unlinkSync(outputFile)
       return { CID }
     } catch (e) {
       throw new Error(e)

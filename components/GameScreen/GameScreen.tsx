@@ -3,6 +3,8 @@ import Image from "next/image"
 import _ from "lodash"
 import MintButton from "../MintButton"
 import { MUSIC_URLS } from "../../lib/consts"
+import GeneratedMusic from "./GeneratedMusic"
+import getIpfsLink from "../../lib/getIpfsLink"
 
 interface IOption {
   id: string
@@ -30,30 +32,36 @@ const GameScreen = ({ onSuccess }: any) => {
     bass: string | null
     guitar: string | null
   }>({ drums: null, vocal: null, bass: null, guitar: null })
+  const [musicUrl, setMusicUrl] = useState<string>("")
   const options: IOption[] = [
     { id: "bass", name: "Bass", imgUrl: "/bass.png" },
     { id: "drums", name: "Drums", imgUrl: "/drums.png" },
     { id: "guitar", name: "Guitar", imgUrl: "/guitar.png" },
     { id: "vocal", name: "Vocals", imgUrl: "/vocal.png" },
   ]
-  const onClickHandler = (value: string) => {
-    if (choices.includes(value)) {
-      setChoices([...choices.filter((e) => e !== value)])
+
+  const onClickHandler = async (value: any) => {
+    console.log("clicked", value)
+    setPlayAudio(false)
+    setMusicUrl(null)
+    if (choices.includes(value.name)) {
+      console.log("already playing")
+      setChoices([...choices.filter((e) => e !== value.name)])
     } else {
-      setChoices([...choices, value])
+      console.log("new song")
+      setChoices([...choices, value.name])
+      const musicChoice = value.animation_url
+        ? getIpfsLink(value.animation_url)
+        : _.sample(MUSIC_URLS[value.id])
+      console.log("musicChoice", musicChoice)
+      setInstrumentChoice({
+        ...instrumentChoice,
+        [value.name]: musicChoice,
+      })
+      setMusicUrl(musicChoice)
+      setPlayAudio(true)
     }
-    setChecked({ ...checked, [value]: !checked[value] })
-  }
-  const [musicUrl, setMusicUrl] = useState<string>("")
-  const onMouseOverHandler = (value: string) => {
-    if (checked[value]) return
-    const musicChoice = _.sample(MUSIC_URLS[value])
-    setInstrumentChoice({
-      ...instrumentChoice,
-      [value]: musicChoice,
-    })
-    setMusicUrl(musicChoice)
-    setPlayAudio(true)
+    setChecked({ ...checked, [value.name]: !checked[value.name] })
   }
 
   return (
@@ -68,20 +76,16 @@ const GameScreen = ({ onSuccess }: any) => {
               key={option.id}
               type="button"
               className={`p-4 m-2 ${
-                checked[option.id] ? `border-green-500` : "border-white-500"
-              }  ${checked[option.id] ? "border-4" : "border-4"} rounded-full disabled:opacity-25`}
-              onClick={() => onClickHandler(option.id)}
-              onMouseEnter={() => {
-                onMouseOverHandler(option.id)
-              }}
-              onMouseLeave={() => {
-                setPlayAudio(false)
-              }}
-              disabled={choices.length === 2 && !choices.includes(option.id)}
+                checked[option.name] ? `border-green-500` : "border-white-500"
+              }  ${
+                checked[option.name] ? "border-4" : "border-4"
+              } rounded-full disabled:opacity-25`}
+              onClick={() => onClickHandler(option)}
+              disabled={choices.length === 2 && !choices.includes(option.name)}
             >
               <Image src={option.imgUrl} alt={option.name} width={100} height={100} />
             </button>
-            {playAudio && musicUrl && !checked[option.id] && (
+            {playAudio && musicUrl && (
               <audio autoPlay>
                 <source src={musicUrl} type="audio/mpeg" />
                 <track kind="captions" />
@@ -90,6 +94,13 @@ const GameScreen = ({ onSuccess }: any) => {
           </div>
         ))}
       </div>
+      <GeneratedMusic
+        checked={checked}
+        choices={choices}
+        playAudio={playAudio}
+        musicUrl={musicUrl}
+        onClickHandler={onClickHandler}
+      />
 
       {choices.length > 1 && (
         <MintButton choices={choices} onSuccess={onSuccess} instrumentUrl={instrumentChoice} />

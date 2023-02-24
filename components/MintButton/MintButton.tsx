@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import { FC, useState } from "react"
@@ -27,6 +28,7 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, choices }) => {
       track2: _.sample(MUSIC_URLS[choices[1]]),
     })
     const { CID } = remixAndUploadResponse.data
+    console.log("CID", CID)
     setMixing(false)
     setIsMinting(true)
     const initialData = getEncodedPurchaseData(CID)

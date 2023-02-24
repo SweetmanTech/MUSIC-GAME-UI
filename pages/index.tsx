@@ -7,7 +7,7 @@ import LaunchPage from "../components/LaunchPage"
 import Results from "../components/Results"
 import Chat from "../components/Chat"
 
-const GameScreen = dynamic(() => import("../components/GameScreen"), { ssr: false })
+const GameScreen = dynamic(() => import("../components/GameScreen"))
 
 const Home: NextPage = () => {
   const [entered, setEntered] = useState(false)

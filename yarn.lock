@@ -4319,11 +4319,6 @@ cross-spawn@^7.0.2:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-crunker@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/crunker/-/crunker-2.1.0.tgz#05b424b143c6294b9418c937f052c0834eab4398"
-  integrity sha512-yn2hd2Po8u7Bympg66ElL5MIQcQnSAaPh16h2i8rZwaArwlESZEf4m+9Z6Abu/HMr+YNvPrNgA7ioN0bKVQcAw==
-
 crypto-hash@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/crypto-hash/-/crypto-hash-1.3.0.tgz#b402cb08f4529e9f4f09346c3e275942f845e247"

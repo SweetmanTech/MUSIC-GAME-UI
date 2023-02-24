@@ -34,7 +34,7 @@ const TokenRow = ({
       return
     }
     if (staked) {
-      await unstake(stakingContract, tokenId, onSuccess, setPendingTxStep)
+      await unstake(nftContract, tokenId, onSuccess, setPendingTxStep)
     } else {
       const response = await stake(
         nftContract,

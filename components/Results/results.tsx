@@ -4,16 +4,13 @@ import { useEffect, useState } from "react"
 import { LensShareButton } from "@infinity-keys/react-lens-share-button"
 import "@infinity-keys/react-lens-share-button/dist/style.css"
 import Confetti from "react-confetti"
-<<<<<<< HEAD
 import { useRouter } from "next/router"
-=======
 import { TwitterShareButton } from "next-share"
->>>>>>> ef7b86eee809881e0383868fede14d37d6456489
+import { useAccount } from "wagmi"
 import SkeletonCard from "../SkeletonCard"
 import getIpfsLink from "../../lib/getIpfsLink"
 import useWindowSize from "../../lib/useWindowSize"
 import Button from "../Button"
-import { useAccount } from "wagmi"
 
 const Results = ({ metadata }: any) => {
   const { image, name, animationUrl, tokenId } = metadata

@@ -4,7 +4,6 @@ import { Contract, ethers } from "ethers"
 import { useRouter } from "next/router"
 import SteakChatSvg from "../SVG/SteakChat"
 import TokenRow from "../SVG/TokenRow"
-import { getStakedZdkTokens, getZdkTokens } from "../../lib/zdk"
 import getIpfsLink from "../../lib/getIpfsLink"
 import abi from "../../lib/abi-musicGame.json"
 import getNfts from "../../lib/getNfts"
@@ -26,8 +25,6 @@ const MainPage = ({ setPendingTxStep }) => {
 
   const load = async (signerOrProvider) => {
     if (account) {
-      const zdkTokens = await getZdkTokens(account)
-      console.log("ZDK TOKENS", zdkTokens)
       const alchemyTokens = await getNfts(owner as string, address)
       console.log("alchemyTokens", alchemyTokens.ownedNfts)
       setUnstakedTokens(alchemyTokens.ownedNfts)

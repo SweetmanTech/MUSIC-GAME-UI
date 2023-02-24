@@ -1,5 +1,5 @@
 import { useState } from "react"
-import useChat from "../../hooks/useChat"
+import useChat from "../../../../hooks/useChat"
 /* eslint-disable @next/next/no-img-element */
 const ChatBox = ({ setOpenChat, roomName }) => {
   const [newMessage, setNewMessage] = useState("")

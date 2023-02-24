@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react"
 import { LensShareButton } from "@infinity-keys/react-lens-share-button"

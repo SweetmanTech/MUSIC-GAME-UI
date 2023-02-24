@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import { FC, useState } from "react"

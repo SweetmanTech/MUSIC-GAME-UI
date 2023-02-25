@@ -8,7 +8,7 @@ const purchase = async (signer: Signer, initialData?: string) => {
 
   const contract = new ethers.Contract(contractAddress, abi, signer)
   try {
-    const tx = await contract.purchase(1, initialData)
+    const tx = await contract.purchase(1, initialData, { value: ethers.utils.parseEther("0.001") })
     const receipt = await tx.wait()
     return receipt
   } catch (err) {

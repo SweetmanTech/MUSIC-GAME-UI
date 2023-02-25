@@ -163,9 +163,10 @@ const GameScreen = ({ onSuccess }: any) => {
               className={`p-4 m-2 ${
                 checked[option.id] ? `border-green-500` : "border-white-500"
               }  ${checked[option.id] ? "border-4" : "border-4"} rounded-full disabled:opacity-25 ${
-                loadingAssets && "animate-pulse"
+                loadingAssets && "animate-pulse bg-gray-400 cursor-not-allowed"
               } w-[100px] h-[100px]`}
               onClick={() => onClickHandler(option.id, option.musicUrl)}
+              disabled={loadingAssets}
             >
               {!loadingAssets && (
                 <Image src={option.imgUrl} alt={option.name} width={100} height={100} />

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
 import Image from "next/image"
-import _ from "lodash"
 import MintButton from "../MintButton"
 import { MUSIC_URLS } from "../../lib/consts"
 
@@ -17,6 +16,7 @@ interface IChecked {
 }
 const GameScreen = ({ onSuccess }: any) => {
   const context = useMemo(() => new AudioContext(), [])
+  const bufferSources = useMemo(() => [], [])
   const [choices, setChoices] = useState<Array<string>>([])
   const [checked, setChecked] = useState<IChecked>({
     drums: false,
@@ -33,7 +33,7 @@ const GameScreen = ({ onSuccess }: any) => {
     { id: "vocal", name: "Vocals", imgUrl: "/vocal.png" },
   ]
   const onClickHandler = (value: string) => {
-    const musicChoice = _.sample(MUSIC_URLS[value])
+    const musicChoice = MUSIC_URLS[value][0]
     if (choices.includes(value)) {
       setChoices([...choices.filter((e) => e !== value)])
       setChosenAudioTrack([...chosenAudioTracks.filter((e) => e !== musicChoice)])
@@ -46,11 +46,12 @@ const GameScreen = ({ onSuccess }: any) => {
   const play = useCallback(
     (audioBuffer: AudioBuffer) => {
       const source = context.createBufferSource()
+      bufferSources.push(source)
       source.buffer = audioBuffer
       source.connect(context.destination)
       source.start()
     },
-    [context],
+    [context, bufferSources],
   )
   const fetchAudio = useCallback(
     async (url: string) => {
@@ -69,7 +70,12 @@ const GameScreen = ({ onSuccess }: any) => {
         })
       })
     }
-  }, [chosenAudioTracks, fetchAudio, play, playAudio])
+    if (!playAudio && chosenAudioTracks.length > 0 && context.state === "suspended") {
+      bufferSources.forEach((source) => {
+        source.stop()
+      })
+    }
+  }, [chosenAudioTracks, fetchAudio, play, playAudio, context, bufferSources])
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4 p-4 align-center">
       <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">

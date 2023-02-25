@@ -51,9 +51,9 @@ const GameScreen = ({ onSuccess }: any) => {
     )
     const tokens = await contract.cre8ingTokens()
     const uris = await contract.cre8ingURI()
-    const tokensFiltered = tokens.filter((token) => token.toString() !== "0")
-    const urisFiltered = uris.filter((uri) => uri !== "")
-    const urisDecoded = urisFiltered.map((uri, index) => {
+    const tokensFiltered = tokens.filter((token: number) => token.toString() !== "0")
+    const urisFiltered = uris.filter((uri: string) => uri !== "")
+    const urisDecoded = urisFiltered.map((uri: string, index: number) => {
       const sub = uri.substring(uri.indexOf(",") + 1)
       return { ...JSON.parse(window.atob(sub)), tokenId: tokensFiltered[index] }
     })
@@ -75,12 +75,22 @@ const GameScreen = ({ onSuccess }: any) => {
     }
   }, [loadingAssets, getStakedTracks])
 
+  const stopAudio = useCallback(() => {
+    setPlayAudio(false)
+    context.suspend()
+    bufferSources.forEach((source) => {
+      source.stop()
+    })
+  }, [bufferSources, context])
+
   const onClickHandler = (value: string, musicUrl: string) => {
     if (choices.includes(value)) {
       setChoices([...choices.filter((e) => e !== value)])
+      stopAudio()
       setChosenAudioTrack([...chosenAudioTracks.filter((e) => e !== musicUrl)])
     } else {
       setChoices([...choices, value])
+      stopAudio()
       setChosenAudioTrack([...chosenAudioTracks, musicUrl])
     }
     setChecked({ ...checked, [value]: !checked[value] })
@@ -104,28 +114,27 @@ const GameScreen = ({ onSuccess }: any) => {
     },
     [context],
   )
+  const playTracks = useCallback(() => {
+    chosenAudioTracks.forEach((track) => {
+      fetchAudio(track).then((audioBuffer) => {
+        play(audioBuffer)
+      })
+    })
+  }, [chosenAudioTracks, fetchAudio, play])
   useEffect(() => {
     if (chosenAudioTracks.length === 0) {
       setPlayAudio(false)
-      bufferSources.forEach((source) => {
-        source.stop()
-      })
+      stopAudio()
     }
-  }, [chosenAudioTracks, bufferSources])
+  }, [chosenAudioTracks, bufferSources, stopAudio])
   useEffect(() => {
     if ((chosenAudioTracks.length, playAudio)) {
-      chosenAudioTracks.forEach((track) => {
-        fetchAudio(track).then((audioBuffer) => {
-          play(audioBuffer)
-        })
-      })
+      playTracks()
     }
     if (!playAudio && chosenAudioTracks.length > 0 && context.state === "suspended") {
-      bufferSources.forEach((source) => {
-        source.stop()
-      })
+      stopAudio()
     }
-  }, [chosenAudioTracks, fetchAudio, play, playAudio, context, bufferSources])
+  }, [chosenAudioTracks, fetchAudio, playTracks, playAudio, context, stopAudio])
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4 p-4 align-center">
       <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">

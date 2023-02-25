@@ -18,6 +18,19 @@ interface IChecked {
   bass: boolean
   guitar: boolean
 }
+
+type DecodedURI = {
+  name: string
+  image: string
+  animation_url: string
+  description: string
+  properties: {
+    name: string
+    number: number
+  }
+  tokenId: number
+}
+
 const getProvider = () => {
   const goerliRpc = "https://ethereum-goerli-rpc.allthatnode.com"
   const provider = ethers.getDefaultProvider(goerliRpc)
@@ -58,7 +71,7 @@ const GameScreen = ({ onSuccess }: any) => {
       return { ...JSON.parse(window.atob(sub)), tokenId: tokensFiltered[index] }
     })
     const newOptions = []
-    urisDecoded.forEach((uri) => {
+    urisDecoded.forEach((uri: DecodedURI) => {
       newOptions.push({
         id: uri.name,
         name: uri.name,
@@ -69,6 +82,7 @@ const GameScreen = ({ onSuccess }: any) => {
     setOptions([...options, ...newOptions])
     setLoadingAssets(false)
   }, [options])
+
   useEffect(() => {
     if (loadingAssets) {
       getStakedTracks()

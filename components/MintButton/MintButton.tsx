@@ -22,8 +22,6 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, audioTracksToMix }) => {
   const handleClick = async () => {
     if (!signer) return
     setMixing(true)
-    console.log("choices", choices)
-    console.log("instrumentUrl", instrumentUrl)
     const remixAndUploadResponse = await axios.post("/api/remix", {
       tracks: audioTracksToMix,
     })

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
 import Image from "next/image"
+import axios from "axios"
 import MintButton from "../MintButton"
 import { MUSIC_URLS } from "../../lib/consts"
-import getStakedTrackLib from "../../lib/getStakedTracks"
 
 interface IOption {
   id: string
@@ -38,7 +38,7 @@ const GameScreen = ({ onSuccess }: any) => {
   ])
 
   const getStakedTracks = useCallback(async () => {
-    const newOptions = await getStakedTrackLib()
+    const { data: newOptions } = await axios.get("/api/getStakedTracks")
     setOptions([...options, ...newOptions])
     setLoadingAssets(false)
   }, [options])

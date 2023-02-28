@@ -27,7 +27,9 @@ const getStakedTracks = async () => {
   const urisFiltered = uris.filter((uri: string) => uri !== "")
   const urisDecoded = urisFiltered.map((uri: string, index: number) => {
     const sub = uri.substring(uri.indexOf(",") + 1)
-    return { ...JSON.parse(window.atob(sub)), tokenId: tokensFiltered[index] }
+    const buff = Buffer.from(sub, "base64");
+    const text = buff.toString("ascii");
+    return { ...JSON.parse(text), tokenId: tokensFiltered[index] }
   })
   const newOptions = []
   urisDecoded.forEach((uri: DecodedURI) => {

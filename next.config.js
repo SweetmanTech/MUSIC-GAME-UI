@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["nftstorage.link"],
+    domains: ["images.unsplash.com", "nftstorage.link"],
   },
 }
 

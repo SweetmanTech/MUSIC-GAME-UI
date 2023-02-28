@@ -4,6 +4,7 @@ import { createHandler, Post, Body } from "next-api-decorators"
 import { readFileSync } from "fs"
 import { Blob } from "buffer"
 import { randomUUID } from "crypto"
+import getIpfsLink from "../../../lib/getIpfsLink"
 
 const client = new NFTStorage({
   token: `${process?.env?.NEXT_PUBLIC_NFT_STORAGE_TOKEN}`,
@@ -14,12 +15,14 @@ const ffmpeg = require("fluent-ffmpeg")
 
 ffmpeg.setFfmpegPath(ffmpegStatic)
 
-const mixAudio = (track1: string, track2: string, output: string) =>
+const mixAudio = (tracks: string[], output: string) =>
   new Promise((resolve, reject) => {
-    ffmpeg()
-      .input(track1)
-      .input(track2)
-      .outputOptions("-filter_complex", "amix=inputs=2:duration=longest")
+    const mergedAudio = ffmpeg()
+    tracks.forEach((track: string) => {
+      mergedAudio.input(track)
+    })
+    mergedAudio
+      .outputOptions("-filter_complex", `amix=inputs=${tracks.length}:duration=longest`)
       .saveToFile(output)
       // Log the percentage of work completed
       .on("progress", () => null)
@@ -31,16 +34,16 @@ const mixAudio = (track1: string, track2: string, output: string) =>
   })
 class Remix {
   @Post()
-  async remix(@Body() body: { track1: string; track2: string }) {
-    const { track1, track2 } = body
+  async remix(@Body() body: { tracks: string[] }) {
+    const { tracks } = body
     const uuid = randomUUID()
     const outputFile = `/tmp/${uuid}.wav`
     try {
-      await mixAudio(track1, track2, outputFile)
+      await mixAudio(tracks, outputFile)
       const audioFile = readFileSync(outputFile)
       const fileToBlob = new Blob([audioFile], { type: "audio/wav" })
       const CID = await client.storeBlob(fileToBlob as any)
-      return { CID }
+      return { CID, audioURL: getIpfsLink(`ipfs://${CID}`) }
     } catch (e) {
       throw new Error(e)
     }

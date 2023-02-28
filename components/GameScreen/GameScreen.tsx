@@ -1,21 +1,22 @@
-import { useState } from "react"
-import Image from "next/image"
-import _ from "lodash"
+import { useCallback, useEffect, useState, useMemo } from "react"
+import { Contract, ethers } from "ethers"
 import MintButton from "../MintButton"
 import { MUSIC_URLS } from "../../lib/consts"
+import abi from "../../lib/abi-musicGame.json"
+import getIpfsLink from "../../lib/getIpfsLink"
+import MediaControls from "./components/MediaControls"
+import MusicTrackIcon from "../Icons/MusicTrackIcon"
+import { DecodedURI, IChecked, IOption } from "./GameScreenTypes"
 
-interface IOption {
-  id: string
-  name: string
-  imgUrl?: string
-}
-interface IChecked {
-  drums: boolean
-  vocal: boolean
-  bass: boolean
-  guitar: boolean
+const getProvider = () => {
+  const goerliRpc = "https://ethereum-goerli-rpc.allthatnode.com"
+  const provider = ethers.getDefaultProvider(goerliRpc)
+  return provider
 }
 const GameScreen = ({ onSuccess }: any) => {
+  const [loadingAssets, setLoadingAssets] = useState<boolean>(true)
+  const context = useMemo(() => new AudioContext(), [])
+  const bufferSources = useMemo(() => [], [])
   const [choices, setChoices] = useState<Array<string>>([])
   const [checked, setChecked] = useState<IChecked>({
     drums: false,
@@ -24,76 +25,140 @@ const GameScreen = ({ onSuccess }: any) => {
     guitar: false,
   })
   const [playAudio, setPlayAudio] = useState<boolean>(false)
-  const [instrumentChoice, setInstrumentChoice] = useState<{
-    drums: string | null
-    vocal: string | null
-    bass: string | null
-    guitar: string | null
-  }>({ drums: null, vocal: null, bass: null, guitar: null })
-  const options: IOption[] = [
-    { id: "bass", name: "Bass", imgUrl: "/bass.png" },
-    { id: "drums", name: "Drums", imgUrl: "/drums.png" },
-    { id: "guitar", name: "Guitar", imgUrl: "/guitar.png" },
-    { id: "vocal", name: "Vocals", imgUrl: "/vocal.png" },
-  ]
-  const onClickHandler = (value: string) => {
+  const [chosenAudioTracks, setChosenAudioTrack] = useState<Array<string>>([])
+  const [options, setOptions] = useState<IOption[]>([
+    { id: "bass", name: "Bass", imgUrl: "/bass.png", musicUrl: MUSIC_URLS.bass[0] },
+    { id: "drums", name: "Drums", imgUrl: "/drums.png", musicUrl: MUSIC_URLS.drums[0] },
+    { id: "guitar", name: "Guitar", imgUrl: "/guitar.png", musicUrl: MUSIC_URLS.guitar[0] },
+    { id: "vocal", name: "Vocals", imgUrl: "/vocal.png", musicUrl: MUSIC_URLS.vocal[0] },
+  ])
+
+  const getStakedTracks = useCallback(async () => {
+    const contract = new Contract(
+      process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS,
+      abi,
+      getProvider(),
+    )
+    const tokens = await contract.cre8ingTokens()
+    const uris = await contract.cre8ingURI()
+    const tokensFiltered = tokens.filter((token: number) => token.toString() !== "0")
+    const urisFiltered = uris.filter((uri: string) => uri !== "")
+    const urisDecoded = urisFiltered.map((uri: string, index: number) => {
+      const sub = uri.substring(uri.indexOf(",") + 1)
+      return { ...JSON.parse(window.atob(sub)), tokenId: tokensFiltered[index] }
+    })
+    const newOptions = []
+    urisDecoded.forEach((uri: DecodedURI) => {
+      newOptions.push({
+        id: uri.name,
+        name: uri.name,
+        imgUrl: getIpfsLink(uri.image),
+        musicUrl: getIpfsLink(uri.animation_url),
+      })
+    })
+    setOptions([...options, ...newOptions])
+    setLoadingAssets(false)
+  }, [options])
+
+  useEffect(() => {
+    if (loadingAssets) {
+      getStakedTracks()
+    }
+  }, [loadingAssets, getStakedTracks])
+
+  const stopAudio = useCallback(() => {
+    setPlayAudio(false)
+    context.suspend()
+    bufferSources.forEach((source) => {
+      source.stop()
+    })
+  }, [bufferSources, context])
+
+  const onClickHandler = (value: string, musicUrl: string) => {
     if (choices.includes(value)) {
       setChoices([...choices.filter((e) => e !== value)])
+      stopAudio()
+      setChosenAudioTrack([...chosenAudioTracks.filter((e) => e !== musicUrl)])
     } else {
       setChoices([...choices, value])
+      stopAudio()
+      setChosenAudioTrack([...chosenAudioTracks, musicUrl])
     }
     setChecked({ ...checked, [value]: !checked[value] })
   }
-  const [musicUrl, setMusicUrl] = useState<string>("")
-  const onMouseOverHandler = (value: string) => {
-    if (checked[value]) return
-    const musicChoice = _.sample(MUSIC_URLS[value])
-    setInstrumentChoice({
-      ...instrumentChoice,
-      [value]: musicChoice,
+  const play = useCallback(
+    (audioBuffer: AudioBuffer) => {
+      const source = context.createBufferSource()
+      bufferSources.push(source)
+      source.buffer = audioBuffer
+      source.connect(context.destination)
+      source.start()
+    },
+    [context, bufferSources],
+  )
+  const fetchAudio = useCallback(
+    async (url: string) => {
+      const response = await fetch(url)
+      const arrayBuffer = await response.arrayBuffer()
+      const audioBuffer = await context.decodeAudioData(arrayBuffer)
+      return audioBuffer
+    },
+    [context],
+  )
+  const playTracks = useCallback(() => {
+    chosenAudioTracks.forEach((track) => {
+      fetchAudio(track).then((audioBuffer) => {
+        play(audioBuffer)
+      })
     })
-    setMusicUrl(musicChoice)
-    setPlayAudio(true)
-  }
+  }, [chosenAudioTracks, fetchAudio, play])
 
+  const MediaControlHandler = (isPlaying: boolean) => {
+    if (isPlaying) {
+      stopAudio()
+    } else {
+      setPlayAudio(true)
+      context.resume()
+    }
+  }
+  useEffect(() => {
+    if (chosenAudioTracks.length === 0) {
+      setPlayAudio(false)
+      stopAudio()
+    }
+  }, [chosenAudioTracks, bufferSources, stopAudio])
+  useEffect(() => {
+    if ((chosenAudioTracks.length, playAudio)) {
+      playTracks()
+    }
+    if (!playAudio && chosenAudioTracks.length > 0 && context.state === "suspended") {
+      stopAudio()
+    }
+  }, [chosenAudioTracks, fetchAudio, playTracks, playAudio, context, stopAudio])
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4 p-4 align-center">
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 align-center">
       <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">
-        Pick any 2 instrutments, you can hover to hear possible choice.
+        Pick any music, you can click play to hear possible choice.
       </div>
-      <div className="flex flex-row ">
+      <div className="flex flex-wrap overflow-x-auto">
         {options.map((option) => (
-          <div key={option.id}>
-            <button
-              key={option.id}
-              type="button"
-              className={`p-4 m-2 ${
-                checked[option.id] ? `border-green-500` : "border-white-500"
-              }  ${checked[option.id] ? "border-4" : "border-4"} rounded-full disabled:opacity-25`}
-              onClick={() => onClickHandler(option.id)}
-              onMouseEnter={() => {
-                onMouseOverHandler(option.id)
-              }}
-              onMouseLeave={() => {
-                setPlayAudio(false)
-              }}
-              disabled={choices.length === 2 && !choices.includes(option.id)}
-            >
-              <Image src={option.imgUrl} alt={option.name} width={100} height={100} />
-            </button>
-            {playAudio && musicUrl && !checked[option.id] && (
-              <audio autoPlay>
-                <source src={musicUrl} type="audio/mpeg" />
-                <track kind="captions" />
-              </audio>
-            )}
-          </div>
+          <MusicTrackIcon
+            key={option.id}
+            option={option}
+            checked={checked}
+            onClickHandler={onClickHandler}
+            loadingAssets={loadingAssets}
+          />
         ))}
       </div>
-
-      {choices.length > 1 && (
-        <MintButton choices={choices} onSuccess={onSuccess} instrumentUrl={instrumentChoice} />
-      )}
+      <div className="flex flex-row-reverse gap-4">
+        {chosenAudioTracks.length > 0 && (
+          <MediaControls playAudio={playAudio} MediaControlHandler={MediaControlHandler} />
+        )}
+        {choices.length > 1 && (
+          <MintButton onSuccess={onSuccess} audioTracksToMix={chosenAudioTracks} />
+        )}
+      </div>
     </div>
   )
 }

@@ -1,21 +1,10 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
-import Image from "next/image"
 import axios from "axios"
 import MintButton from "../MintButton"
 import { MUSIC_URLS } from "../../lib/consts"
-
-interface IOption {
-  id: string
-  name: string
-  imgUrl?: string
-  musicUrl?: string
-}
-interface IChecked {
-  drums: boolean
-  vocal: boolean
-  bass: boolean
-  guitar: boolean
-}
+import MediaControls from "./components/MediaControls"
+import MusicTrackIcon from "../Icons/MusicTrackIcon"
+import { IChecked, IOption } from "./GameScreenTypes"
 
 const GameScreen = ({ onSuccess }: any) => {
   const [loadingAssets, setLoadingAssets] = useState<boolean>(true)
@@ -95,6 +84,15 @@ const GameScreen = ({ onSuccess }: any) => {
       })
     })
   }, [chosenAudioTracks, fetchAudio, play])
+
+  const MediaControlHandler = (isPlaying: boolean) => {
+    if (isPlaying) {
+      stopAudio()
+    } else {
+      setPlayAudio(true)
+      context.resume()
+    }
+  }
   useEffect(() => {
     if (chosenAudioTracks.length === 0) {
       setPlayAudio(false)
@@ -114,76 +112,21 @@ const GameScreen = ({ onSuccess }: any) => {
       <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">
         Pick any music, you can click play to hear possible choice.
       </div>
-      <ul className="flex flex-wrap overflow-x-auto">
+      <div className="flex flex-wrap overflow-x-auto">
         {options.map((option) => (
-          <li key={option.id} className="flex-none">
-            <button
-              key={option.id}
-              type="button"
-              className={`p-4 m-2 flex-none ${
-                checked[option.id] ? `border-green-500` : "border-white-500"
-              }  ${checked[option.id] ? "border-4" : "border-4"} rounded-full disabled:opacity-25 ${
-                loadingAssets && "animate-pulse bg-gray-400 cursor-not-allowed"
-              } w-[100px] h-[100px]`}
-              onClick={() => onClickHandler(option.id, option.musicUrl)}
-              disabled={loadingAssets}
-            >
-              {!loadingAssets && (
-                <Image src={option.imgUrl} alt={option.name} width={100} height={100} />
-              )}
-            </button>
-          </li>
+          <MusicTrackIcon
+            key={option.id}
+            option={option}
+            checked={checked}
+            onClickHandler={onClickHandler}
+            loadingAssets={loadingAssets}
+          />
         ))}
-      </ul>
+      </div>
       <div className="flex flex-row-reverse gap-4">
-        {chosenAudioTracks.length > 0 &&
-          (!playAudio ? (
-            <button
-              type="button"
-              onClick={() => {
-                setPlayAudio(true)
-                context.resume()
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
-                />
-              </svg>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setPlayAudio(false)
-                context.suspend()
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-                />
-              </svg>
-            </button>
-          ))}
+        {chosenAudioTracks.length > 0 && (
+          <MediaControls playAudio={playAudio} MediaControlHandler={MediaControlHandler} />
+        )}
         {choices.length > 1 && (
           <MintButton onSuccess={onSuccess} audioTracksToMix={chosenAudioTracks} />
         )}

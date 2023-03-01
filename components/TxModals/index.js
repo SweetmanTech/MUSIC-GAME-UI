@@ -1,3 +1,3 @@
-import TxModal from "./TxModal";
+import TxModal from "./TxModal"
 
-export default TxModal;
+export default TxModal

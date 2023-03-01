@@ -1,3 +1,3 @@
-import StakingPage from "./StakingPage";
+import StakingPage from "./StakingPage"
 
-export default StakingPage;
+export default StakingPage

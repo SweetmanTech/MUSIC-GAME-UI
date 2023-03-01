@@ -49,6 +49,7 @@ const MainPage = ({ setPendingTxStep }) => {
 
     if (!signer) return
     load(getSignerOrProvider())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, chain, chainId, signer])
 
   return (

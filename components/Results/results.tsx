@@ -4,16 +4,21 @@ import { useEffect, useState } from "react"
 import { LensShareButton } from "@infinity-keys/react-lens-share-button"
 import "@infinity-keys/react-lens-share-button/dist/style.css"
 import Confetti from "react-confetti"
+import { useRouter } from "next/router"
 import { TwitterShareButton } from "next-share"
+import { useAccount } from "wagmi"
 import SkeletonCard from "../SkeletonCard"
 import getIpfsLink from "../../lib/getIpfsLink"
 import useWindowSize from "../../lib/useWindowSize"
+import Button from "../Button"
 
 const Results = ({ metadata }: any) => {
   const { image, name, animationUrl, tokenId } = metadata
   const [loading, setLoading] = useState(true)
+  const { address } = useAccount()
   const [startConfetti, setStartConfetti] = useState(true)
   const { width, height } = useWindowSize()
+  const router = useRouter()
 
   const isTestnet = process.env.NEXT_PUBLIC_CHAIN_ID === "5"
   const network = isTestnet ? "goerli" : "ethereum"
@@ -156,6 +161,8 @@ const Results = ({ metadata }: any) => {
           </div>
         </div>
       </div>
+
+      <Button onClick={() => router.push(`/u/${address}`)}>Stake to Play</Button>
 
       <footer className="items-center w-full m-auto text-white rounded-lg px-4justify-center ">
         <div className="flex-col sm:flex sm:items-center sm:justify-between">

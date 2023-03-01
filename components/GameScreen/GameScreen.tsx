@@ -1,18 +1,11 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
-import { Contract, ethers } from "ethers"
+import axios from "axios"
 import MintButton from "../MintButton"
 import { MUSIC_URLS } from "../../lib/consts"
-import abi from "../../lib/abi-musicGame.json"
-import getIpfsLink from "../../lib/getIpfsLink"
 import MediaControls from "./components/MediaControls"
 import MusicTrackIcon from "../Icons/MusicTrackIcon"
-import { DecodedURI, IChecked, IOption } from "./GameScreenTypes"
+import { IChecked, IOption } from "./GameScreenTypes"
 
-const getProvider = () => {
-  const goerliRpc = "https://ethereum-goerli-rpc.allthatnode.com"
-  const provider = ethers.getDefaultProvider(goerliRpc)
-  return provider
-}
 const GameScreen = ({ onSuccess }: any) => {
   const [loadingAssets, setLoadingAssets] = useState<boolean>(true)
   const context = useMemo(() => new AudioContext(), [])
@@ -34,28 +27,7 @@ const GameScreen = ({ onSuccess }: any) => {
   ])
 
   const getStakedTracks = useCallback(async () => {
-    const contract = new Contract(
-      process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS,
-      abi,
-      getProvider(),
-    )
-    const tokens = await contract.cre8ingTokens()
-    const uris = await contract.cre8ingURI()
-    const tokensFiltered = tokens.filter((token: number) => token.toString() !== "0")
-    const urisFiltered = uris.filter((uri: string) => uri !== "")
-    const urisDecoded = urisFiltered.map((uri: string, index: number) => {
-      const sub = uri.substring(uri.indexOf(",") + 1)
-      return { ...JSON.parse(window.atob(sub)), tokenId: tokensFiltered[index] }
-    })
-    const newOptions = []
-    urisDecoded.forEach((uri: DecodedURI) => {
-      newOptions.push({
-        id: uri.name,
-        name: uri.name,
-        imgUrl: getIpfsLink(uri.image),
-        musicUrl: getIpfsLink(uri.animation_url),
-      })
-    })
+    const { data: newOptions } = await axios.get("/api/getStakedTracks")
     setOptions([...options, ...newOptions])
     setLoadingAssets(false)
   }, [options])

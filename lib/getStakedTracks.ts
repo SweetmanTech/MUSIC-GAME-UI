@@ -2,18 +2,7 @@ import { Contract } from "ethers"
 import getProvider from "./getProvider"
 import abi from "./abi-musicGame.json"
 import getIpfsLink from "./getIpfsLink"
-
-type DecodedURI = {
-  name: string
-  image: string
-  animation_url: string
-  description: string
-  properties: {
-    name: string
-    number: number
-  }
-  tokenId: number
-}
+import { DecodedURI } from "../components/GameScreen/GameScreenTypes"
 
 const getStakedTracks = async () => {
   const contract = new Contract(

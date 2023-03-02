@@ -1,3 +1,3 @@
-import UnstakedTrackList from "./UnstakedTrackList";
+import UnstakedTrackList from "./UnstakedTrackList"
 
 export default UnstakedTrackList

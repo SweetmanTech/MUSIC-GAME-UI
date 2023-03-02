@@ -14,7 +14,7 @@ interface MintButtonProps {
   audioTracksToMix: string[]
 }
 
-const MintButton: FC<MintButtonProps> = ({ onSuccess, audioTracksToMix }) => {
+const MintButton: FC<MintButtonProps> = ({ onSuccess, audioTracksToMix, choices }) => {
   const [mixing, setMixing] = useState<boolean>(false)
   const [isMinting, setIsMinting] = useState<boolean>(false)
   const { data: signer } = useSigner()
@@ -27,9 +27,13 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, audioTracksToMix }) => {
     })
     const { CID } = remixAndUploadResponse.data
     console.log("CID", CID)
+    console.log("choices", choices)
+    const tokenIds = choices.map((tokenName) => tokenName.substring(tokenName.indexOf("e ") + 2))
+    console.log("tokenIds", tokenIds)
+    console.log("audioTracksToMix", audioTracksToMix)
     setMixing(false)
     setIsMinting(true)
-    const initialData = getEncodedPurchaseData(CID)
+    const initialData = getEncodedPurchaseData(CID, tokenIds)
     const receipt = await purchase(signer, initialData)
     if (!receipt.error) {
       const tokenId = receipt.events[0].args.tokenId.toString()

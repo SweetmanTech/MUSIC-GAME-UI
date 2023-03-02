@@ -20,12 +20,7 @@ const GameScreen = ({ onSuccess }: any) => {
   })
   const [playAudio, setPlayAudio] = useState<boolean>(false)
   const [chosenAudioTracks, setChosenAudioTrack] = useState<Array<string>>([])
-  const [options, setOptions] = useState<IOption[]>([
-    { id: "bass", name: "Bass", imgUrl: "/bass.png", musicUrl: MUSIC_URLS.bass[0] },
-    { id: "drums", name: "Drums", imgUrl: "/drums.png", musicUrl: MUSIC_URLS.drums[0] },
-    { id: "guitar", name: "Guitar", imgUrl: "/guitar.png", musicUrl: MUSIC_URLS.guitar[0] },
-    { id: "vocal", name: "Vocals", imgUrl: "/vocal.png", musicUrl: MUSIC_URLS.vocal[0] },
-  ])
+  const [options, setOptions] = useState<IOption[]>([])
 
   const getStakedTracks = useCallback(async () => {
     const { data: newOptions } = await axios.get("/api/getStakedTracks")
@@ -129,7 +124,11 @@ const GameScreen = ({ onSuccess }: any) => {
           <MediaControls playAudio={playAudio} MediaControlHandler={MediaControlHandler} />
         )}
         {choices.length > 1 && (
-          <MintButton onSuccess={onSuccess} audioTracksToMix={chosenAudioTracks} />
+          <MintButton
+            onSuccess={onSuccess}
+            audioTracksToMix={chosenAudioTracks}
+            choices={choices}
+          />
         )}
       </div>
       <UnstakedTrackList onSuccess={() => setLoadingAssets(true)} loadingAssets={loadingAssets} />

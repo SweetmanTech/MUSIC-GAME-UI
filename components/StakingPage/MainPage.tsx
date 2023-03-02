@@ -58,8 +58,8 @@ const MainPage = ({ setPendingTxStep }) => {
         {tokens.length > 0 &&
           tokens.map((token) => {
             const myTokenId = parseInt(token.id.tokenId, 16)
-            const imgHash = token.metadata.image
-            const isInvalid = imgHash.includes("imgUri") || imgHash.includes("Hello World")
+            const imgHash = token.metadata?.image
+            const isInvalid = imgHash?.includes?.("imgUri") || imgHash?.includes?.("Hello World")
             const imageUrl = isInvalid ? "" : getIpfsLink(imgHash)
             const isStaked = stakedTokens.includes(myTokenId.toString())
             return (

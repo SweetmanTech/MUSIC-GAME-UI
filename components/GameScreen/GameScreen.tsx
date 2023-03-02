@@ -5,6 +5,7 @@ import { MUSIC_URLS } from "../../lib/consts"
 import MediaControls from "./components/MediaControls"
 import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import { IChecked, IOption } from "./GameScreenTypes"
+import UnstakedTrackList from "../UnstakedTrackList"
 
 const GameScreen = ({ onSuccess }: any) => {
   const [loadingAssets, setLoadingAssets] = useState<boolean>(true)
@@ -110,7 +111,7 @@ const GameScreen = ({ onSuccess }: any) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 align-center">
       <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">
-        Pick any music, you can click play to hear possible choice.
+        Pick any sample, then play to hear your mix.
       </div>
       <div className="flex flex-wrap overflow-x-auto">
         {options.map((option) => (
@@ -131,6 +132,7 @@ const GameScreen = ({ onSuccess }: any) => {
           <MintButton onSuccess={onSuccess} audioTracksToMix={chosenAudioTracks} />
         )}
       </div>
+      <UnstakedTrackList onSuccess={() => setLoadingAssets(true)} loadingAssets={loadingAssets} />
     </div>
   )
 }

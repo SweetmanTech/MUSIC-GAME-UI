@@ -29,7 +29,6 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, audioTracksToMix }) => {
     console.log("CID", CID)
     setMixing(false)
     setIsMinting(true)
-    console.log("sample IDs for mint function param?", audioTracksToMix)
     const initialData = getEncodedPurchaseData(CID)
     const receipt = await purchase(signer, initialData)
     if (!receipt.error) {

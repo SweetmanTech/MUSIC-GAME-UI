@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
 import axios from "axios"
 import MintButton from "../MintButton"
-import { MUSIC_URLS } from "../../lib/consts"
 import MediaControls from "./components/MediaControls"
 import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import { IChecked, IOption } from "./GameScreenTypes"

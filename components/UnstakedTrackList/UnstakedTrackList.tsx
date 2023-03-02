@@ -1,11 +1,13 @@
 import { Contract } from "ethers"
 import { useEffect, useState } from "react"
 import { useAccount, useSigner } from "wagmi"
+import { ConnectButton } from "@rainbow-me/rainbowkit"
 import getIpfsLink from "../../lib/getIpfsLink"
 import getUnstakedTracks from "../../lib/getUnstakedTracks"
 import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import abi from "../../lib/abi-musicGame.json"
 import { stake } from "../../lib/stake"
+import Button from "../Button"
 
 const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
   const { address } = useAccount()
@@ -20,6 +22,7 @@ const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
       setUnstaked(response)
       setLoading(false)
     }
+    if (!address) return
     init()
   }, [address, loadingAssets])
 
@@ -29,22 +32,53 @@ const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
   }
 
   return (
-    <div>
-      <div className="text-center text-xl">click your track to add it to the game</div>
-      {unstaked.map((token) => (
-        <MusicTrackIcon
-          key={token.id.tokenId}
-          option={{
-            id: token.id.tokenId,
-            name: token.metadata.name,
-            imgUrl: getIpfsLink(token.metadata.image),
-            musicUrl: token.metadata.animation_url,
-          }}
-          checked={{ drums: false, vocal: false, bass: false, guitar: false }}
-          onClickHandler={() => onClickHandler(parseInt(token.id.tokenId, 16).toString())}
-          loadingAssets={loading}
-        />
-      ))}
+    <div className="flex flex-col gap-3 justify-center items-center">
+      <div className="text-center text-xl">
+        {address
+          ? "click your track to add it to the game"
+          : "or sign in to add your music to the game"}
+      </div>
+      <div>
+        {address ? (
+          unstaked.map((token) => (
+            <MusicTrackIcon
+              key={token.id.tokenId}
+              option={{
+                id: token.id.tokenId,
+                name: token.metadata.name,
+                imgUrl: getIpfsLink(token.metadata.image),
+                musicUrl: token.metadata.animation_url,
+              }}
+              checked={{ drums: false, vocal: false, bass: false, guitar: false }}
+              onClickHandler={() => onClickHandler(parseInt(token.id.tokenId, 16).toString())}
+              loadingAssets={loading}
+            />
+          ))
+        ) : (
+          <ConnectButton.Custom>
+            {({ openConnectModal, mounted }) => {
+              const ready = mounted
+
+              return (
+                <div
+                  {...(!ready && {
+                    "aria-hidden": true,
+                    style: {
+                      opacity: 0,
+                      pointerEvents: "none",
+                      userSelect: "none",
+                    },
+                  })}
+                >
+                  <Button onClick={openConnectModal} type="button">
+                    Sign In
+                  </Button>
+                </div>
+              )
+            }}
+          </ConnectButton.Custom>
+        )}
+      </div>
     </div>
   )
 }

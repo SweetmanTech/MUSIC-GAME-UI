@@ -8,6 +8,7 @@ import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import abi from "../../lib/abi-musicGame.json"
 import { stake } from "../../lib/stake"
 import Button from "../Button"
+import SignInButton from "../SignInButton"
 
 const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
   const { address } = useAccount()
@@ -55,28 +56,7 @@ const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
             />
           ))
         ) : (
-          <ConnectButton.Custom>
-            {({ openConnectModal, mounted }) => {
-              const ready = mounted
-
-              return (
-                <div
-                  {...(!ready && {
-                    "aria-hidden": true,
-                    style: {
-                      opacity: 0,
-                      pointerEvents: "none",
-                      userSelect: "none",
-                    },
-                  })}
-                >
-                  <Button onClick={openConnectModal} type="button">
-                    Sign In
-                  </Button>
-                </div>
-              )
-            }}
-          </ConnectButton.Custom>
+          <SignInButton />
         )}
       </div>
     </div>

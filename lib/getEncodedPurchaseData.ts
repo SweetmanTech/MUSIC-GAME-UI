@@ -1,6 +1,6 @@
 import { AbiCoder } from "ethers/lib/utils.js"
 
-const getEncodedPurchaseData = (cid: string, tokenIds: number[]) => {
+const getEncodedPurchaseData = (cid: string, tokenIds: string[]) => {
   const abiCoder = new AbiCoder()
 
   const initialData = abiCoder.encode(

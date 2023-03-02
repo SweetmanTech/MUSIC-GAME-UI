@@ -4,13 +4,9 @@ import abi from "./abi-musicGame.json"
 import getNfts from "./getNfts"
 
 const getUnstakedTracks = async (address: string) => {
-  const contract = new Contract(
-    process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS,
-    abi,
-    getProvider(),
-  )
-
-  const alchemyTokens = await getNfts(address, process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS)
+  const contractAddress = process.env.NEXT_PUBLIC_MUSIC_GAME_CONTRACT_ADDRESS
+  const contract = new Contract(contractAddress, abi, getProvider())
+  const alchemyTokens = await getNfts(address, contractAddress)
   const stakedRaw = await contract.cre8ingTokens()
   const stakedStrings = stakedRaw.map((token) => token.toString())
   const stakedFinal = stakedStrings.filter((token) => token !== "0")

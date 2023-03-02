@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState, useMemo } from "react"
 import axios from "axios"
 import MintButton from "../MintButton"
-import { MUSIC_URLS } from "../../lib/consts"
 import MediaControls from "./components/MediaControls"
 import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import { IChecked, IOption } from "./GameScreenTypes"
+import UnstakedTrackList from "../UnstakedTrackList"
 
 const GameScreen = ({ onSuccess }: any) => {
   const [loadingAssets, setLoadingAssets] = useState<boolean>(true)
@@ -19,12 +19,7 @@ const GameScreen = ({ onSuccess }: any) => {
   })
   const [playAudio, setPlayAudio] = useState<boolean>(false)
   const [chosenAudioTracks, setChosenAudioTrack] = useState<Array<string>>([])
-  const [options, setOptions] = useState<IOption[]>([
-    { id: "bass", name: "Bass", imgUrl: "/bass.png", musicUrl: MUSIC_URLS.bass[0] },
-    { id: "drums", name: "Drums", imgUrl: "/drums.png", musicUrl: MUSIC_URLS.drums[0] },
-    { id: "guitar", name: "Guitar", imgUrl: "/guitar.png", musicUrl: MUSIC_URLS.guitar[0] },
-    { id: "vocal", name: "Vocals", imgUrl: "/vocal.png", musicUrl: MUSIC_URLS.vocal[0] },
-  ])
+  const [options, setOptions] = useState<IOption[]>([])
 
   const getStakedTracks = useCallback(async () => {
     const { data: newOptions } = await axios.get("/api/getStakedTracks")
@@ -110,7 +105,7 @@ const GameScreen = ({ onSuccess }: any) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 align-center">
       <div className="p-4 m-4 font-mono text-2xl font-extrabold text-gray-900 bg-white rounded-md">
-        Pick any music, you can click play to hear possible choice.
+        Pick any sample, then play to hear your mix.
       </div>
       <div className="flex flex-wrap overflow-x-auto">
         {options.map((option) => (
@@ -128,9 +123,14 @@ const GameScreen = ({ onSuccess }: any) => {
           <MediaControls playAudio={playAudio} MediaControlHandler={MediaControlHandler} />
         )}
         {choices.length > 1 && (
-          <MintButton onSuccess={onSuccess} audioTracksToMix={chosenAudioTracks} />
+          <MintButton
+            onSuccess={onSuccess}
+            audioTracksToMix={chosenAudioTracks}
+            choices={choices}
+          />
         )}
       </div>
+      <UnstakedTrackList onSuccess={() => setLoadingAssets(true)} loadingAssets={loadingAssets} />
     </div>
   )
 }

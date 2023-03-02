@@ -1,13 +1,11 @@
 import { Contract } from "ethers"
 import { useEffect, useState } from "react"
 import { useAccount, useSigner } from "wagmi"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
 import getIpfsLink from "../../lib/getIpfsLink"
 import getUnstakedTracks from "../../lib/getUnstakedTracks"
 import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import abi from "../../lib/abi-musicGame.json"
 import { stake } from "../../lib/stake"
-import Button from "../Button"
 import SignInButton from "../SignInButton"
 
 const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {

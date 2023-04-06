@@ -7,6 +7,7 @@ import MusicTrackIcon from "../Icons/MusicTrackIcon"
 import abi from "../../lib/abi-musicGame.json"
 import { stake } from "../../lib/stake"
 import SignInButton from "../SignInButton"
+import axios from "axios"
 
 const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
   const { address } = useAccount()
@@ -17,8 +18,13 @@ const UnstakedTrackList = ({ onSuccess, loadingAssets }: any) => {
   useEffect(() => {
     const init = async () => {
       setLoading(true)
+
       const response = await getUnstakedTracks(address)
-      setUnstaked(response)
+      const tokenIDs = response.map((token) => parseInt(token.id.tokenId, 16))
+      const { data: newOptions } = await axios.post("/api/getMetadata", {
+        tokenIDs,
+      })
+      setUnstaked(newOptions)
       setLoading(false)
     }
     if (!address) return

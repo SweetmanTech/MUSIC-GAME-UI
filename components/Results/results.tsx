@@ -28,7 +28,6 @@ const Results = ({ metadata }: any) => {
 
   useEffect(() => {
     if (tokenId && metadata) {
-      console.log("audio url", getIpfsLink(animationUrl))
       setLoading(false)
       setTimeout(() => {
         setStartConfetti(false)

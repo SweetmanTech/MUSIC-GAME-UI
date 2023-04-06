@@ -26,11 +26,7 @@ const MintButton: FC<MintButtonProps> = ({ onSuccess, audioTracksToMix, choices 
       tracks: audioTracksToMix,
     })
     const { CID } = remixAndUploadResponse.data
-    console.log("CID", CID)
-    console.log("choices", choices)
     const tokenIds = choices.map((tokenName) => tokenName.substring(tokenName.indexOf("e ") + 2))
-    console.log("tokenIds", tokenIds)
-    console.log("audioTracksToMix", audioTracksToMix)
     setMixing(false)
     setIsMinting(true)
     const initialData = getEncodedPurchaseData(CID, tokenIds)

@@ -23,9 +23,9 @@ const GameScreen = ({ onSuccess }: any) => {
 
   const getStakedTracks = useCallback(async () => {
     const { data: newOptions } = await axios.get("/api/getStakedTracks")
-    setOptions([...options, ...newOptions])
+    setOptions(newOptions)
     setLoadingAssets(false)
-  }, [options])
+  }, [])
 
   useEffect(() => {
     if (loadingAssets) {
